@@ -1,59 +1,204 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adyra Rachellyn Portfolio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adyra Rachellyn — Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container">
-      <a href="#profile" class="brand">Adyra Rachellyn</a>
-      <nav>
-        <a href="#profile">Profile</a>
-      </nav>
+
+  <!-- 1. Pure CSS Splash Screen (Logo UI & Reveal Intro) -->
+  <div class="entrance-overlay">
+    <div class="entrance-content">
+      <div class="ui-mark">
+        <span class="yellow-dot"></span>
+        <strong>UNIVERSITAS INDONESIA</strong>
+      </div>
+      <h2 class="entrance-name">Adyra Rachellyn<span>.</span></h2>
+      <p class="entrance-sub">Information Systems &middot; Fasilkom UI</p>
     </div>
+  </div>
+
+  <!-- 2. Floating Pill Navbar -->
+  <header class="navbar-wrapper">
+    <div class="brand-side">
+      <a href="#about" class="brand-logo">adyra<span>.</span></a>
+    </div>
+
+    <nav class="pill-nav">
+      <a href="#about" class="nav-btn active">Home</a>
+      <a href="#about-detail" class="nav-btn">About</a>
+      <a href="#projects" class="nav-btn">Projects</a>
+      <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
+    </nav>
   </header>
-  <main>
-    <section class="hero" id="profile">
-      <div class="container hero-grid">
-        <div class="hero-identity">
-          <p class="hero-kicker">Information Systems &middot; Universitas Indonesia</p>
-          <h1>Adyra Rachellyn</h1>
+
+  <main class="page-container">
+
+    <!-- 3. BENTO GRID HERO (About Me - Syarat Checklist 1) -->
+    <section class="bento-grid" id="about">
+      
+      <!-- Card 1: Main Intro & Bio -->
+      <article class="bento-card bento-intro">
+        <div>
+          <!-- Live Radar Pulse Status -->
+          <div class="status-indicator">
+            <span class="pulsing-radar"></span>
+            <span class="status-text">Available for PM & AI Initiatives</span>
+          </div>
+
+          <div class="avatar-circle">
+            <img src="{% static 'img/adyra.jpeg' %}" alt="Photo of Adyra Rachellyn" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=adyra'" />
+          </div>
+          
+          <p class="micro-caps">INFORMATION SYSTEMS @ UI &middot; NPM 2506620620</p>
+          <h1 class="intro-heading">I'm <span class="underline-text">Adyra Rachellyn</span>, building tech for social impact.</h1>
+          <p class="intro-sub">Founder of LYPS Ed-Tech.</p>
         </div>
-        <div class="hero-photo">
-          <div class="photo-block"></div>
-         <img class="avatar" src="/static/img/adyra.jpeg" alt="Photo of Adyra Rachellyn">
+
+        <div class="social-bar">
+          <a href="https://linkedin.com" target="_blank" rel="noopener">LINKEDIN</a>
+          <a href="https://instagram.com" target="_blank" rel="noopener">INSTAGRAM</a>
+          <a href="https://github.com/adyrachellynn" target="_blank" rel="noopener">GITHUB</a>
         </div>
-        <div class="hero-details">
-          <p class="bio">Information Systems student at Universitas Indonesia passionate about AI, product development, and building impactful digital solutions.</p>
-          <dl class="meta-list">
-            <div class="meta-row">
-              <dt>NPM</dt>
-              <dd>2506620620</dd>
-            </div>
-            <div class="meta-row">
-              <dt>Program</dt>
-              <dd>S1 Sistem Informasi</dd>
-            </div>
-          </dl>
-          <div class="social-links">
-            <a href="https://github.com/adyrachellynn" target="_blank" class="social-link">GitHub</a>
-            <a href="https://linkedin.com/" target="_blank" class="social-link">LinkedIn</a>
-            <a href="mailto:adyra.rachellyn@ui.ac.id" class="social-link">Email</a>
+      </article>
+
+      <!-- Card 2: Map Location -->
+      <article class="bento-card bento-map">
+        <div class="map-pin-pill">
+          <span class="pin-icon">📍</span>
+          <div class="pin-text">
+            <small>BASED IN</small>
+            <strong>Bekasi, ID 🇮🇩</strong>
           </div>
         </div>
+      </article>
+
+      <!-- Card 3: Skills & Certifications -->
+      <article class="bento-card bento-certs">
+        <p class="certs-label">CERTIFICATIONS & SKILLS</p>
+        <ul class="cert-list">
+          <li>Data Science</li>
+          <li>Dart & Flutter</li>
+          <li>Swift Programming</li>
+          <li>UI/UX Design</li>
+        </ul>
+      </article>
+
+      <!-- Card 4: Education -->
+      <article class="bento-card bento-edu">
+        <span class="edu-mortarboard">🎓</span>
+        <h3>Univ. Indonesia</h3>
+        <p>INFORMATION SYSTEMS</p>
+      </article>
+
+      <!-- Card 5: Dark Resumé Card -->
+      <article class="bento-card bento-dark-resume interactive-card">
+        <div class="dark-top">
+          <span class="res-tag">RESUMÉ</span>
+          <span class="arrow-diag">↗</span>
+        </div>
+        <p class="dark-text"><em>Founder of LYPS & 255 Media. Click to view my professional journey.</em></p>
+      </article>
+
+      <!-- Card 6: Metric Highlight -->
+      <article class="bento-card bento-metric">
+        <h2 class="metric-num">3000+</h2>
+        <p class="metric-label">ATTENDEES MANAGED</p>
+      </article>
+
+    </section>
+
+    <!-- 4. NARRATIVE & PHILOSOPHY -->
+    <section class="narrative-section" id="about-detail">
+      <h2 class="section-big-title">Bridging <span>Tech and Impact.</span></h2>
+      <p class="narrative-lead">
+        I am an Information Systems student at <strong>Universitas Indonesia</strong> who thrives at the intersection of technology, strategy, and human impact. My journey is defined by a passion for building digital solutions that solve real-world problems.
+      </p>
+
+      <div class="philosophy-grid">
+        <article class="phil-card">
+          <h3>Strategic Leadership</h3>
+          <p>Experienced in leading cross-functional teams of 50+ members and managing large-scale operations for 3,000+ participants.</p>
+        </article>
+        <article class="phil-card">
+          <h3>User-Centric Growth</h3>
+          <p>Founder of LYPS Ed-Tech, focusing on empowering young girls through accessible digital platforms and data-driven strategies.</p>
+        </article>
+      </div>
+
+      <div class="narrative-body">
+        <p>My approach is rooted in <strong>Product Thinking</strong>. Whether I'm developing a mobile community platform or coordinating student initiatives, I focus on the "why" before the "how."</p>
+        <p>I leverage my technical foundation in <strong>Data Science, Dart, and Swift</strong> to bridge the gap between complex engineering requirements and intuitive user experiences.</p>
       </div>
     </section>
+
+    <!-- 5. SECTION BARU: SELECTED WORKS (Syarat Checklist 2: Minimal 3 item) -->
+    <section class="works-section" id="projects">
+      <div class="works-header">
+        <h2 class="section-big-title">Selected Works<span>.</span></h2>
+      </div>
+
+      <div class="works-grid">
+        
+        <!-- Item 1 -->
+        <article class="work-card interactive-card">
+          <div class="work-card-head">
+            <span class="work-role">FOUNDER & EXECUTIVE DIRECTOR</span>
+            <span class="work-metric-pill">100+ STUDENTS</span>
+          </div>
+          <h3 class="work-title">LYPS Ed-Tech</h3>
+          <p class="work-desc">An integrated project-based learning and mentoring ecosystem bridging educational gaps for young girls in Frontier (3T) regions.</p>
+          <div class="work-tags">
+            <span class="pill-tag">Next.js</span>
+            <span class="pill-tag">Social Impact</span>
+            <span class="pill-tag">Product Ops</span>
+          </div>
+        </article>
+
+        <!-- Item 2 -->
+        <article class="work-card interactive-card">
+          <div class="work-card-head">
+            <span class="work-role">FOUNDER & PRESIDENT</span>
+            <span class="work-metric-pill">200% GROWTH</span>
+          </div>
+          <h3 class="work-title">255 Digital Media Platform</h3>
+          <p class="work-desc">Student-run digital media platform producing 20+ podcast episodes and 50+ digital content pieces driving youth empowerment.</p>
+          <div class="work-tags">
+            <span class="pill-tag">Digital Branding</span>
+            <span class="pill-tag">Leadership</span>
+            <span class="pill-tag">Strategy</span>
+          </div>
+        </article>
+
+        <!-- Item 3 -->
+        <article class="work-card work-dark-span interactive-card">
+          <div class="work-card-head">
+            <span class="work-role role-light">LEAD TECH DEVELOPER</span>
+            <span class="work-metric-pill pill-dark-mode">HEALTH-TECH INITIATIVE</span>
+          </div>
+          <h3 class="work-title title-light">PeduliKeluarga</h3>
+          <p class="work-desc desc-light">A proactive healthcare ecosystem concept helping families coordinate preventative care, track health metrics, and streamline communication.</p>
+          <div class="work-tags">
+            <span class="pill-tag tag-dark">Healthcare</span>
+            <span class="pill-tag tag-dark">Product Strategy</span>
+            <span class="pill-tag tag-dark">Gemastik</span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
   </main>
+
   <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2026 Adyra Rachellyn. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-    </div>
+    <p>&copy; 2026 Adyra Rachellyn. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
   </footer>
+
 </body>
 </html>
