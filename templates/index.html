@@ -12,48 +12,49 @@
 </head>
 <body>
 
-  <!-- 1. Pure CSS Splash Screen (Logo UI & Reveal Intro) -->
-  <div class="entrance-overlay">
+  <!-- 1. Pure CSS Splash Screen  -->
+  <aside class="entrance-overlay" aria-label="Loading Screen">
     <div class="entrance-content">
-      <div class="ui-mark">
-        <span class="yellow-dot"></span>
+      <div class="makara-badge">
+        <span class="makara-sun" aria-hidden="true">✦</span>
         <strong>UNIVERSITAS INDONESIA</strong>
       </div>
       <h2 class="entrance-name">Adyra Rachellyn<span>.</span></h2>
       <p class="entrance-sub">Information Systems &middot; Fasilkom UI</p>
     </div>
-  </div>
+  </aside>
 
   <!-- 2. Floating Pill Navbar -->
   <header class="navbar-wrapper">
     <div class="brand-side">
-      <a href="#about" class="brand-logo">adyra<span>.</span></a>
+      <a href="#about" class="brand-logo" onclick="closeProjectsView()">adyra<span>.</span></a>
     </div>
 
-    <nav class="pill-nav">
-      <a href="#about" class="nav-btn active">Home</a>
-      <a href="#about-detail" class="nav-btn">About</a>
-      <a href="#projects" class="nav-btn">Projects</a>
+    <nav class="pill-nav" aria-label="Main Navigation">
+      <a href="#about" class="nav-btn active" onclick="closeProjectsView()">Home</a>
+      <a href="#about-detail" class="nav-btn" onclick="closeProjectsView()">About</a>
+      <a href="#projects" class="nav-btn" onclick="openProjectsView()">Projects</a>
+      <a href="#snapshots" class="nav-btn" onclick="closeProjectsView()">Snaps</a>
       <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
     </nav>
   </header>
 
-  <main class="page-container">
+  <!-- TAMPILAN UTAMA (HOME) -->
+  <main class="page-container" id="main-content">
 
-    <!-- 3. BENTO GRID HERO (About Me - Syarat Checklist 1) -->
-    <section class="bento-grid" id="about">
+    <!-- 3. BENTO GRID HERO -->
+    <section class="bento-grid" id="about" aria-label="Profile Overview">
       
       <!-- Card 1: Main Intro & Bio -->
       <article class="bento-card bento-intro">
         <div>
-          <!-- Live Radar Pulse Status -->
           <div class="status-indicator">
-            <span class="pulsing-radar"></span>
+            <span class="pulsing-radar" aria-hidden="true"></span>
             <span class="status-text">Available for PM & AI Initiatives</span>
           </div>
 
           <div class="avatar-circle">
-            <img src="{% static 'img/adyra.jpeg' %}" alt="Photo of Adyra Rachellyn" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=adyra'" />
+            <img src="{% static 'img/adyra.jpeg' %}" alt="Portrait of Adyra Rachellyn" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=adyra'" />
           </div>
           
           <p class="micro-caps">INFORMATION SYSTEMS @ UI &middot; NPM 2506620620</p>
@@ -62,49 +63,64 @@
         </div>
 
         <div class="social-bar">
-          <a href="https://linkedin.com" target="_blank" rel="noopener">LINKEDIN</a>
-          <a href="https://instagram.com" target="_blank" rel="noopener">INSTAGRAM</a>
-          <a href="https://github.com/adyrachellynn" target="_blank" rel="noopener">GITHUB</a>
+          <a href="https://www.linkedin.com/in/adyra-rachellyn/" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
+          <a href="https://www.instagram.com/adyrachellynn?stkn=ZGJ6bnFpdGh1eWd1" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+          <a href="https://github.com/adyrachellynn" target="_blank" rel="noopener noreferrer">GITHUB</a>
         </div>
       </article>
 
-      <!-- Card 2: Map Location -->
-      <article class="bento-card bento-map">
-        <div class="map-pin-pill">
-          <span class="pin-icon">📍</span>
+     <!-- Card 2: Map Location -->
+      <article class="bento-card bento-map" style="position: relative; overflow: hidden; padding: 20px; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(246, 243, 238, 0.4), rgba(246, 243, 238, 0.4)), url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=600&q=80') center/cover no-repeat !important;">
+        <div class="map-pin-pill" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 12px 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12); display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.8); z-index: 2;">
+          <span class="pin-icon" aria-hidden="true" style="font-size: 1.3rem;">📍</span>
           <div class="pin-text">
-            <small>BASED IN</small>
-            <strong>Bekasi, ID 🇮🇩</strong>
+            <small style="display: block; font-size: 0.62rem; font-weight: 800; letter-spacing: 1px; color: #8d8981;">BASED IN</small>
+            <strong style="font-size: 0.85rem; font-weight: 700;">Bekasi, ID 🇮🇩</strong>
           </div>
         </div>
       </article>
 
-      <!-- Card 3: Skills & Certifications -->
+     <!-- Card 3: Skills & Certifications (Updated with Credential Drive Link) -->
       <article class="bento-card bento-certs">
-        <p class="certs-label">CERTIFICATIONS & SKILLS</p>
+        <a href="https://drive.google.com/file/d/1_AyUkAqgDCd_7712BhHitppTTp_esi0T/view?usp=drive_link" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <p class="certs-label" style="margin-bottom: 0;">CERTIFICATIONS</p>
+          <span class="arrow-diag" style="font-size: 1rem; color: #b09971;" aria-hidden="true">↗</span>
+        </a>
         <ul class="cert-list">
-          <li>Data Science</li>
-          <li>Dart & Flutter</li>
-          <li>Swift Programming</li>
-          <li>UI/UX Design</li>
+          <li>
+            <strong>Data Science</strong>
+            <small style="display: block; font-size: 0.72rem; color: var(--text-sub); font-weight: 500;">Generasi Maju Berkarya</small>
+          </li>
+          <li>
+            <strong>Dart & Flutter</strong>
+            <small style="display: block; font-size: 0.72rem; color: var(--text-sub); font-weight: 500;">Dicoding Indonesia</small>
+          </li>
+          <li>
+            <strong>Front-End Dev</strong>
+            <small style="display: block; font-size: 0.72rem; color: var(--text-sub); font-weight: 500;">LinkedIn Learning</small>
+          </li>
+          <li>
+            <strong>Basic WebDev</strong>
+            <small style="display: block; font-size: 0.72rem; color: var(--text-sub); font-weight: 500;">Skilvul (HTML, CSS, JS)</small>
+          </li>
         </ul>
       </article>
 
       <!-- Card 4: Education -->
       <article class="bento-card bento-edu">
-        <span class="edu-mortarboard">🎓</span>
+        <span class="edu-mortarboard" aria-hidden="true">🎓</span>
         <h3>Univ. Indonesia</h3>
         <p>INFORMATION SYSTEMS</p>
       </article>
 
       <!-- Card 5: Dark Resumé Card -->
-      <article class="bento-card bento-dark-resume interactive-card">
+      <a href="https://drive.google.com/file/d/1G0TtZ3ytIpXoSkjIDx3f09tN4FB-hL9Y/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="bento-card bento-dark-resume interactive-card">
         <div class="dark-top">
-          <span class="res-tag">RESUMÉ</span>
-          <span class="arrow-diag">↗</span>
+          <span class="res-tag">CURRICULUM VITAE</span>
+         <span class="arrow-diag" style="font-size: 1.1rem; color: var(--text-sub);" aria-hidden="true">↗</span>
         </div>
-        <p class="dark-text"><em>Founder of LYPS & 255 Media. Click to view my professional journey.</em></p>
-      </article>
+        <p class="dark-text"><em>Founder of LYPS & 255 Media. Click here to view my updated CV.</em></p>
+      </a>
 
       <!-- Card 6: Metric Highlight -->
       <article class="bento-card bento-metric">
@@ -112,10 +128,24 @@
         <p class="metric-label">ATTENDEES MANAGED</p>
       </article>
 
+      <!-- Card 7: Bento Snapshot Preview -->
+      <a href="#snapshots" class="bento-card bento-snaps-preview interactive-card">
+        <div class="snaps-preview-top">
+          <span class="snaps-tag">BEYOND THE TERMINAL</span>
+          <span class="arrow-diag" aria-hidden="true">↓</span>
+        </div>
+        <div class="snaps-badge-group">
+          <span>⛰️ Mountain Hikes</span>
+          <span>⛺ Outdoor Trails</span>
+          <span>🎧 Lo-Fi & Coffee</span>
+        </div>
+        <p class="snaps-preview-desc">A peek into life outside tech. See snapshots & stories &rarr;</p>
+      </a>
+
     </section>
 
     <!-- 4. NARRATIVE & PHILOSOPHY -->
-    <section class="narrative-section" id="about-detail">
+    <section class="narrative-section" id="about-detail" aria-label="Background and Philosophy">
       <h2 class="section-big-title">Bridging <span>Tech and Impact.</span></h2>
       <p class="narrative-lead">
         I am an Information Systems student at <strong>Universitas Indonesia</strong> who thrives at the intersection of technology, strategy, and human impact. My journey is defined by a passion for building digital solutions that solve real-world problems.
@@ -133,72 +163,281 @@
       </div>
 
       <div class="narrative-body">
-        <p>My approach is rooted in <strong>Product Thinking</strong>. Whether I'm developing a mobile community platform or coordinating student initiatives, I focus on the "why" before the "how."</p>
+        <p>My approach is rooted in <strong>Product Thinking</strong>. Whether I'm developing a mobile community platform or coordinating student initiatives, I focus on the "why" before the "how." I believe that the most successful products are built through empathy and a relentless focus on the end-user.</p>
         <p>I leverage my technical foundation in <strong>Data Science, Dart, and Swift</strong> to bridge the gap between complex engineering requirements and intuitive user experiences.</p>
+      </div>
+
+      <!-- Garis divider tipis -->
+      <hr class="about-divider" style="border: none; border-top: 1px solid #e6e2d8; margin: 36px 0 24px 0; max-width: 860px;" />
+
+      <!-- Tombol CTA Ganda -->
+      <div class="about-cta-group" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 8px;">
+        <a href="https://drive.google.com/file/d/1G0TtZ3ytIpXoSkjIDx3f09tN4FB-hL9Y/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-primary-dark" style="display: inline-flex; align-items: center; justify-content: center; background-color: #4a4235; color: #ffffff; font-size: 0.95rem; font-weight: 700; text-decoration: none; padding: 14px 30px; border-radius: 999px; box-shadow: 0 4px 14px rgba(74, 66, 53, 0.2); cursor: pointer;">
+          Download Resumé
+        </a>
+        <button type="button" onclick="openProjectsView()" class="btn-secondary-white" style="display: inline-flex; align-items: center; justify-content: center; background-color: #ffffff; color: #1e293b; font-size: 0.95rem; font-weight: 700; text-decoration: none; padding: 14px 30px; border-radius: 999px; border: 1px solid #e6e2d8; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); cursor: pointer;">
+          View My Work
+        </button>
       </div>
     </section>
 
-    <!-- 5. SECTION BARU: SELECTED WORKS (Syarat Checklist 2: Minimal 3 item) -->
-    <section class="works-section" id="projects">
-      <div class="works-header">
-        <h2 class="section-big-title">Selected Works<span>.</span></h2>
+   <!-- 5. SELECTED WORKS (Bento Preview dengan Clear Affordance & Micro-interactions) -->
+    <section class="works-section" id="projects-preview-section" aria-label="Selected Works">
+      <div class="works-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 30px;">
+        <div>
+          <h2 class="section-big-title" style="margin-bottom: 4px;">Selected Works<span>.</span></h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Handpicked products driving social impact and technology innovation.</p>
+        </div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--accent-orange); background: rgba(217, 83, 47, 0.1); padding: 6px 14px; border-radius: 999px;">
+          ✦ Click any card to explore full case studies
+        </span>
       </div>
 
       <div class="works-grid">
-        
-        <!-- Item 1 -->
-        <article class="work-card interactive-card">
+        <!-- Project Card 1: LYPS -->
+        <article class="work-card interactive-card" onclick="openProjectsView()" style="cursor: pointer; position: relative; transition: all 0.3s ease;">
           <div class="work-card-head">
             <span class="work-role">FOUNDER & EXECUTIVE DIRECTOR</span>
             <span class="work-metric-pill">100+ STUDENTS</span>
           </div>
           <h3 class="work-title">LYPS Ed-Tech</h3>
           <p class="work-desc">An integrated project-based learning and mentoring ecosystem bridging educational gaps for young girls in Frontier (3T) regions.</p>
-          <div class="work-tags">
-            <span class="pill-tag">Next.js</span>
-            <span class="pill-tag">Social Impact</span>
-            <span class="pill-tag">Product Ops</span>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: 12px;">
+            <div class="work-tags">
+              <span class="pill-tag">Next.js</span>
+              <span class="pill-tag">Social Impact</span>
+            </div>
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--accent-orange); display: inline-flex; align-items: center; gap: 4px;">
+              View Showcase &rarr;
+            </span>
           </div>
         </article>
 
-        <!-- Item 2 -->
-        <article class="work-card interactive-card">
+       <!-- Card 2: 255 Digital Media (Linktree Terhubung) -->
+        <article class="work-card interactive-card" style="position: relative;">
           <div class="work-card-head">
             <span class="work-role">FOUNDER & PRESIDENT</span>
             <span class="work-metric-pill">200% GROWTH</span>
           </div>
           <h3 class="work-title">255 Digital Media Platform</h3>
           <p class="work-desc">Student-run digital media platform producing 20+ podcast episodes and 50+ digital content pieces driving youth empowerment.</p>
-          <div class="work-tags">
-            <span class="pill-tag">Digital Branding</span>
-            <span class="pill-tag">Leadership</span>
-            <span class="pill-tag">Strategy</span>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 16px; margin-top: 12px;">
+            <div class="work-tags">
+              <span class="pill-tag">Digital Media</span>
+              <span class="pill-tag">Community</span>
+            </div>
+            <a href="https://linktr.ee/255digital" target="_blank" rel="noopener noreferrer" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+              Linktree ↗
+            </a>
           </div>
         </article>
 
-        <!-- Item 3 -->
-        <article class="work-card work-dark-span interactive-card">
+        <!-- Project Card 3: Fitur PeduliKeluarga -->
+        <article class="work-card work-dark-span interactive-card" onclick="openProjectsView()" style="cursor: pointer; position: relative; transition: all 0.3s ease;">
           <div class="work-card-head">
             <span class="work-role role-light">LEAD TECH DEVELOPER</span>
             <span class="work-metric-pill pill-dark-mode">HEALTH-TECH INITIATIVE</span>
           </div>
           <h3 class="work-title title-light">PeduliKeluarga</h3>
           <p class="work-desc desc-light">A proactive healthcare ecosystem concept helping families coordinate preventative care, track health metrics, and streamline communication.</p>
-          <div class="work-tags">
-            <span class="pill-tag tag-dark">Healthcare</span>
-            <span class="pill-tag tag-dark">Product Strategy</span>
-            <span class="pill-tag tag-dark">Gemastik</span>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #38342e; padding-top: 16px; margin-top: 12px;">
+            <div class="work-tags">
+              <span class="pill-tag tag-dark">Healthcare</span>
+              <span class="pill-tag tag-dark">Gemastik</span>
+            </div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #ffd000; display: inline-flex; align-items: center; gap: 6px;">
+              Explore Full Prototype Details &rarr;
+            </span>
           </div>
         </article>
+      </div>
+    </section>
+
+   <!-- 6. LIFE & SNAPSHOTS (Curated Outdoor Journal & Horizontal Strip) -->
+    <section class="snaps-section" id="snapshots" aria-label="Hobbies and Snapshots">
+      <div class="works-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; margin-bottom: 28px;">
+        <div>
+          <h2 class="section-big-title" style="margin-bottom: 6px;">Life & <span>Snapshots.</span></h2>
+          <p class="snaps-section-lead" style="margin-bottom: 0;">Off the screen. Trail logs, summits, and views in between.</p>
+        </div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-sub); background: var(--card-white); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+          <span>&larr;</span>
+          <span>Slide to explore</span>
+          <span>&rarr;</span>
+        </div>
+      </div>
+
+      <!-- Container geser satu baris horizontal rapat -->
+      <div class="polaroid-gallery" style="display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; overflow-y: hidden !important; gap: 20px !important; padding: 12px 8px 32px 8px !important; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+        
+        <!-- 1. Papandayan -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/papandayan.jpeg' %}" alt="Gunung Papandayan" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Gunung Papandayan</strong>
+            <small>2.665 MDPL &middot; Alun-Alun Surya Kencana route</small>
+          </figcaption>
+        </figure>
+
+        <!-- 2. Puncak Kuta -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/kuta.jpeg' %}" alt="Puncak Kuta" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Puncak Kuta</strong>
+            <small>1.050 MDPL &middot; Highland ridge traverse</small>
+          </figcaption>
+        </figure>
+
+        <!-- 3. Kawah Ratu -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/kawahratu.jpeg' %}" alt="Kawah Ratu" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Kawah Ratu</strong>
+            <small>1.437 MDPL &middot; Mt. Salak caldera corridor</small>
+          </figcaption>
+        </figure>
+
+        <!-- 4. Gunung Kencana -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/kencana.jpeg' %}" alt="Gunung Kencana" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Gunung Kencana</strong>
+            <small>1.803 MDPL &middot; Canopy & technical steps</small>
+          </figcaption>
+        </figure>
+
+        <!-- 5. Kencana 2 (Ridgeline) -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/kencana2.jpeg' %}" alt="Pos Cibulao" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Pos Cibulao</strong>
+            <small>1.400 MDPL &middot; Alpine pine sanctuary</small>
+          </figcaption>
+        </figure>
+
+        <!-- 6. Puncak Luhur -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/luhur.jpeg' %}" alt="Puncak Luhur" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Puncak Luhur</strong>
+            <small>1.090 MDPL &middot; Morning valley overlook</small>
+          </figcaption>
+        </figure>
+
+        <!-- 7. Coastline -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/pantai.jpeg' %}" alt="Pesisir Selatan" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Pesisir Selatan</strong>
+            <small>0 MDPL &middot; Southern breakwater horizon</small>
+          </figcaption>
+        </figure>
+
+        <!-- 8. Edelweiss -->
+        <figure class="gallery-polaroid" style="flex: 0 0 280px !important; width: 280px !important; min-width: 280px !important; scroll-snap-align: start; margin: 0 !important;">
+          <div class="polaroid-frame" style="width: 100%; height: 260px; overflow: hidden; border-radius: 14px; margin-bottom: 14px;">
+            <img src="{% static 'img/bunga.jpeg' %}" alt="Tegal Alun" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <figcaption class="polaroid-caption">
+            <strong>Tegal Alun</strong>
+            <small>2.500 MDPL &middot; Endemic subalpine meadow</small>
+          </figcaption>
+        </figure>
 
       </div>
     </section>
 
   </main>
 
+ <!-- =======================================================
+       HALAMAN PENUH PROJEK (Foto Asli PNG)
+       ======================================================= -->
+  <section id="projects-view" class="projects-fullscreen-view" style="display: none; max-width: 1120px; margin: 0 auto; padding: 40px 24px 80px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 48px; flex-wrap: wrap; gap: 16px;">
+      <button type="button" onclick="closeProjectsView()" style="background: #ffffff; border: 1px solid #e6e2d8; color: #141413; padding: 10px 22px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; cursor: pointer;">
+        &larr; Back to Home
+      </button>
+      <div style="display: flex; gap: 10px;">
+        <span style="font-size: 0.75rem; font-weight: 700; padding: 8px 18px; border-radius: 999px; background: #ffffff; border: 1px solid #e6e2d8; color: #6b6863;">TECH STACKS</span>
+        <span style="font-size: 0.75rem; font-weight: 700; padding: 8px 18px; border-radius: 999px; background: #ffffff; border: 1px solid #e6e2d8; color: #6b6863;">CERTIFICATES</span>
+        <span style="font-size: 0.75rem; font-weight: 700; padding: 8px 18px; border-radius: 999px; background: #3b5042; color: #ffffff; border: 1px solid #3b5042;">PROJECTS</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 64px;">
+      
+      <!-- Project 1: SimKopDes 2.0 -->
+      <article style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: #ffffff; border: 1px solid #e6e2d8; border-radius: 28px; padding: 32px; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;">
+          <img src="{% static 'img/Simkopdes.png' %}" alt="SimKopDes 2.0" style="max-height: 240px; width: auto; max-width: 100%; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); object-fit: contain;" />
+          <img src="{% static 'img/simkopdes2.png' %}" alt="SimKopDes 2.0 Interface" style="max-height: 240px; width: auto; max-width: 100%; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); object-fit: contain;" />
+        </div>
+        <div>
+          <p style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; color: #8d8981; margin-bottom: 6px;">WEB APP &bull; DASHBOARD &bull; KOPERASI DESA</p>
+          <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #141413;">SimKopDes 2.0</h3>
+          <p style="font-size: 0.98rem; color: #6b6863; max-width: 840px; line-height: 1.6;">Sistem informasi manajemen koperasi desa berbasis web dengan dashboard analitik real-time untuk transparansi, efisiensi administrasi, dan pelaporan keuangan terpadu.</p>
+        </div>
+      </article>
+
+      <!-- Project 2: PeduliKeluarga -->
+      <article style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: #ffffff; border: 1px solid #e6e2d8; border-radius: 28px; padding: 32px; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;">
+          <img src="{% static 'img/PeduliKeluarga.png' %}" alt="PeduliKeluarga Overview" style="max-height: 240px; width: auto; max-width: 100%; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); object-fit: contain;" />
+          <img src="{% static 'img/PeduliKeluarga2.png' %}" alt="PeduliKeluarga App Prototype" style="max-height: 240px; width: auto; max-width: 100%; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); object-fit: contain;" onerror="this.style.display='none'" />
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 6px;">
+            <p style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; color: #8d8981; margin-bottom: 0;">MOBILE APP &bull; SOCIAL IMPACT &bull; HEALTHCARE</p>
+            <a href="https://www.youtube.com/watch?v=FUUSZrS8l2Q" target="_blank" rel="noopener noreferrer" style="font-size: 0.85rem; font-weight: 700; color: #d9532f; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: rgba(217, 83, 47, 0.08); padding: 6px 14px; border-radius: 999px;">
+              Watch Video Demo ↗
+            </a>
+          </div>
+          <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #141413;">PeduliKeluarga</h3>
+          <p style="font-size: 0.98rem; color: #6b6863; max-width: 840px; line-height: 1.6;">Platform penghubung keluarga multi-generasi inovatif untuk koordinasi jadwal perawatan lansia, pemantauan kesehatan berkala, dan komunikasi hangat antar anggota keluarga.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  </section>
+
   <footer class="site-footer">
     <p>&copy; 2026 Adyra Rachellyn. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
   </footer>
+
+  <!-- Switch View Script -->
+  <script>
+    function openProjectsView() {
+      document.getElementById('main-content').style.display = 'none';
+      document.getElementById('projects-view').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeProjectsView() {
+      document.getElementById('projects-view').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
 
 </body>
 </html>
