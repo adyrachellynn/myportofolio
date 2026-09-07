@@ -13,8 +13,8 @@
 Portofolio web berbasis Django yang mengusung desain minimalis dengan konsep bento grid. Beberapa fitur yang tersedia:
 
 - **About / Profil Diri**: Menampilkan data diri, latar belakang pendidikan, sertifikasi, serta ringkasan pengalaman dan pendekatan kerja penulis di bagian awal halaman.
-- **Interactive Project Showcase**: Menampilkan proyek-proyek unggulan (LYPS Ed-Tech, 255 Digital Media Platform, dan PeduliKeluarga) yang dapat diklik untuk melihat studi kasus lengkap dari masing-masing proyek.
-- **Life & Snapshots**: Galeri visual yang menampilkan sisi kehidupan di luar dunia coding dan kampus — dari pendakian gunung hingga momen sehari-hari — sebagai bentuk keseimbangan antara "baris kode" dan kehidupan nyata.
+- **Interactive Project Showcase**: Menampilkan proyek-proyek unggulan (LYPS Ed-Tech, 255 Digital Media Platform, dan PeduliKeluarga) yang dapat diklik untuk melihat studi kasus lengkap dari masing masing proyek.
+- **Life & Snapshots**: Galeri personal of myself yang menampilkan sisi kehidupan di luar dunia coding dan kampus. Dari pendakian gunung hingga momen sehari hari, sebagai bentuk keseimbangan antara "baris kode" dan kehidupan nyata #LifeWorkBalance ^^
 - **Responsive Layout**: Tampilan responsif menggunakan Tailwind/CSS custom agar navigasi tetap nyaman diakses dari berbagai ukuran perangkat.
 
 ---
@@ -65,7 +65,7 @@ Tantangan yang paling terasa adalah menyesuaikan bento grid multi-kolom dan gale
 
 Batasan utama dari static web adalah konten yang sifatnya hardcoded langsung di dalam berkas HTML. Setiap kali ingin menambah proyek baru, memperbarui data portofolio, atau mengubah deskripsi, saya perlu mengedit source code secara manual.
 
-Untuk iterasi selanjutnya dengan arsitektur MVT Django, beberapa fungsionalitas dinamis yang ingin dipersiapkan:
+Untuk iterasi selanjutnya dengan arsitektur MVT Django, beberapa fungsionalitas dinamis yang ingin saya persiapkan:
 
 - Integrasi model database untuk menyimpan data proyek, tautan, dan galeri secara terstruktur.
 - Halaman admin/form untuk menambah atau memperbarui konten portofolio tanpa perlu menyentuh kode HTML.
