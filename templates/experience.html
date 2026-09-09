@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Experience - {{ name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+
+  <!-- Floating Pill Navbar -->
+  <header class="navbar-wrapper">
+    <div class="brand-side">
+      <a href="{% url 'main:show_main' %}" class="brand-logo brand">{{ name }}<span>.</span></a>
+    </div>
+
+    <nav class="pill-nav" aria-label="Main Navigation">
+      <a href="{% url 'main:show_main' %}" class="nav-btn">Home</a>
+      <a href="{% url 'main:show_experience' %}" class="nav-btn active">Experience</a>
+      <a href="{% url 'main:show_main' %}#about-detail" class="nav-btn">About</a>
+      <a href="{% url 'main:show_main' %}#projects-preview-section" class="nav-btn">Projects</a>
+      <a href="{% url 'main:show_main' %}#snapshots" class="nav-btn">Snaps</a>
+      <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Halaman Khusus Experience -->
+<!-- Halaman Khusus Experience -->
+  <main class="page-container" id="main-content" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 60px;">
+    <section class="experience-section" id="experience" style="border-top: none; padding: 0;">
+      <div class="container">
+        <p class="section-kicker">Perjalanan saya sejauh ini</p>
+        <h1 class="section-big-title" style="font-size: 2.25rem; font-weight: 800; margin: 0.25rem 0 2rem;">Experience<span style="color: #c97a56;">.</span></h1>
+
+        <div class="experience-grid">
+          {% for experience in experience_list %}
+          <article class="experience-card" style="border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="experience-category">
+                {{ experience.get_category_display }}
+              </span>
+              <h2>{{ experience.title }}</h2>
+              <p class="experience-description">
+                {{ experience.description }}
+              </p>
+            </div>
+            {% if experience.is_ongoing %}
+            <p class="experience-status">Sedang berlangsung</p>
+            {% else %}
+            <p class="experience-status">Selesai</p>
+            {% endif %}
+          </article>
+          {% empty %}
+          <div class="empty-box">
+            <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+  </footer>
+
+</body>
+</html>
