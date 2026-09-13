@@ -7,15 +7,116 @@
   <title>Experience - {{ name }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <style>
+    /* Editorial Stacked Timeline List */
+    .exp-editorial-wrap {
+      max-width: 860px;
+      margin: 2.5rem auto 0;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle, #e6e2d8);
+      border-radius: 28px;
+      padding: 1rem 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
+
+    .exp-row-item {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 32px;
+      padding: 2.2rem 0;
+      border-bottom: 1px solid #f0ece1;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .exp-row-item:last-child {
+      border-bottom: none;
+    }
+
+    .exp-meta-side {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .exp-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(59, 80, 66, 0.08);
+      color: #3b5042;
+      border: 1px solid rgba(59, 80, 66, 0.15);
+      width: fit-content;
+    }
+
+    .exp-status-pill {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #8d8981;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-ongoing {
+      color: #2e7d32;
+      font-weight: 700;
+    }
+
+    .status-ongoing::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #2e7d32;
+    }
+
+    .exp-content-side h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.3;
+      color: #141413;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .exp-content-side p {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #6b6863;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .exp-editorial-wrap {
+        padding: 0.5rem 1.25rem;
+      }
+      .exp-row-item {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 1.5rem 0;
+      }
+      .exp-meta-side {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Floating Pill Navbar -->
   <header class="navbar-wrapper">
     <div class="brand-side">
-      <a href="{% url 'main:show_main' %}" class="brand-logo brand">Adyra Rachellyn Arkossand<span>.</span></a>
+      <a href="{% url 'main:show_main' %}" class="brand-logo brand">Adyra<span>.</span></a>
     </div>
 
     <nav class="pill-nav" aria-label="Main Navigation">
@@ -28,39 +129,46 @@
     </nav>
   </header>
 
-  <!-- Halaman Khusus Experience -->
-<!-- Halaman Khusus Experience -->
-  <main class="page-container" id="main-content" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 60px;">
-    <section class="experience-section" id="experience" style="border-top: none; padding: 0;">
-      <div class="container">
-        <p class="section-kicker">Perjalanan saya sejauh ini</p>
-        <h1 class="section-big-title" style="font-size: 2.25rem; font-weight: 800; margin: 0.25rem 0 2rem;">Experience<span style="color: #c97a56;">.</span></h1>
-
-        <div class="experience-grid">
-          {% for experience in experience_list %}
-          <article class="experience-card" style="border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <span class="experience-category">
-                {{ experience.get_category_display }}
-              </span>
-              <h2>{{ experience.title }}</h2>
-              <p class="experience-description">
-                {{ experience.description }}
-              </p>
-            </div>
-            {% if experience.is_ongoing %}
-            <p class="experience-status">Sedang berlangsung</p>
-            {% else %}
-            <p class="experience-status">Selesai</p>
-            {% endif %}
-          </article>
-          {% empty %}
-          <div class="empty-box">
-            <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
-          </div>
-          {% endfor %}
+  <!-- Content -->
+  <main class="page-container" id="main-content" style="max-width: 1120px; margin: 0 auto; padding: 120px 24px 80px;">
+    <section class="experience-section" style="border-top: none; padding: 0;">
+      
+      <div style="max-width: 860px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <p class="section-kicker" style="margin: 0 0 6px 0;">PERJALANAN SAYA SEJAUH INI</p>
+          <h1 class="section-big-title" style="font-size: 2.35rem; font-weight: 800; margin: 0;">Experience<span>.</span></h1>
         </div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: #3b5042; background: rgba(59, 80, 66, 0.08); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(59, 80, 66, 0.15);">
+          ✦ Track Record
+        </span>
       </div>
+
+      <div class="exp-editorial-wrap">
+        {% for experience in experience_list %}
+        <article class="exp-row-item">
+          <div class="exp-meta-side">
+            <span class="exp-tag">{{ experience.get_category_display }}</span>
+            {% if experience.is_ongoing %}
+              <span class="exp-status-pill status-ongoing">Sedang berlangsung</span>
+            {% else %}
+              <span class="exp-status-pill">Selesai</span>
+            {% endif %}
+          </div>
+
+          <div class="exp-content-side">
+            <h2>{{ experience.title }}</h2>
+            {% if experience.description %}
+              <p>{{ experience.description }}</p>
+            {% endif %}
+          </div>
+        </article>
+        {% empty %}
+        <div style="padding: 2.5rem 1rem; text-align: center; color: #8d8981;">
+          Belum ada pengalaman yang ditambahkan.
+        </div>
+        {% endfor %}
+      </div>
+
     </section>
   </main>
 
