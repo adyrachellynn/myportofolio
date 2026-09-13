@@ -24,3 +24,18 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class Education(models.Model):
+    CATEGORY_CHOICES = [
+        ("formal", "Pendidikan Formal"),
+        ("informal", "Pendidikan Informal & Sertifikasi"),
+    ]
+
+    institution = models.CharField(max_length=150)
+    title = models.CharField(max_length=150)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="formal")
+    year = models.CharField(max_length=50)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.institution}"
