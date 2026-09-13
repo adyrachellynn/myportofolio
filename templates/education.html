@@ -32,28 +32,38 @@
       transform: translateY(-3px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
     }
-    /* Hero Card untuk UI (Span 2 Kolom) */
+
+    /* Hero Card untuk UI (Span 2 Kolom) - Warm Terracotta Orange */
     .bento-card-edu.featured {
       grid-column: span 2;
-      background: #1e1b18;
+      background: linear-gradient(135deg, #d9532f 0%, #ba3f1d 100%);
       color: #ffffff;
-      border-color: #38342e;
+      border-color: rgba(217, 83, 47, 0.2);
+      box-shadow: 0 10px 30px rgba(217, 83, 47, 0.18);
     }
     .bento-card-edu.featured h2 {
       color: #ffffff;
-      font-size: 1.5rem;
+      font-size: 1.55rem;
+      font-weight: 800;
     }
     .bento-card-edu.featured .edu-inst {
-      color: #ffd000;
+      color: #ffecd9;
+      font-weight: 700;
     }
     .bento-card-edu.featured .edu-desc {
-      color: #c4beb5;
+      color: #faebe3;
     }
     .bento-card-edu.featured .pill-badge {
-      background: rgba(255, 208, 0, 0.15);
-      color: #ffd000;
-      border-color: rgba(255, 208, 0, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(4px);
     }
+    .bento-card-edu.featured .edu-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffede5;
+    }
+    
     .pill-badge {
       display: inline-block;
       font-size: 0.7rem;
@@ -98,10 +108,6 @@
       font-weight: 600;
       color: #8d8981;
     }
-    .bento-card-edu.featured .edu-footer {
-      border-top-color: #38342e;
-      color: #9c968d;
-    }
     @media (max-width: 900px) {
       .edu-bento-grid {
         grid-template-columns: 1fr;
@@ -117,11 +123,11 @@
   <!-- Floating Pill Navbar -->
   <header class="navbar-wrapper">
     <div class="brand-side">
-      <a href="{% url 'main:show_main' %}" class="brand-logo brand">{{ name }}<span>.</span></a>
+      <a href="{% url 'main:show_main' %}" class="brand-logo brand">Adyra Rachellyn Arkossand<span>.</span></a>
     </div>
 
-  <nav class="pill-nav" aria-label="Main Navigation">
-      <a href="{% url 'main:show_main' %}" class="nav-btn">Home</a>
+    <nav class="pill-nav" aria-label="Main Navigation">
+      <a href="{% url 'main:show_main' %}" class="nav-btn">Profile</a>
       <a href="{% url 'main:show_experience' %}" class="nav-btn">Experience</a>
       <a href="{% url 'main:show_education' %}" class="nav-btn active">Education</a>
       <a href="{% url 'main:show_main' %}#about-detail" class="nav-btn">About</a>
@@ -164,7 +170,7 @@
             <div class="edu-footer">
               <span>Timeline: {{ edu.year }}</span>
               {% if 'Universitas Indonesia' in edu.institution %}
-                <span style="color: #ffd000; font-weight: 700;">★ Active Scholar</span>
+                <span style="color: #ffffff; font-weight: 700; background: rgba(0,0,0,0.15); padding: 3px 10px; border-radius: 999px;">★ Active Scholar</span>
               {% else %}
                 <span>Verified Credential ↗</span>
               {% endif %}

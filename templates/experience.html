@@ -15,14 +15,14 @@
   <!-- Floating Pill Navbar -->
   <header class="navbar-wrapper">
     <div class="brand-side">
-      <a href="{% url 'main:show_main' %}" class="brand-logo brand">{{ name }}<span>.</span></a>
+      <a href="{% url 'main:show_main' %}" class="brand-logo brand">Adyra Rachellyn Arkossand<span>.</span></a>
     </div>
 
     <nav class="pill-nav" aria-label="Main Navigation">
-      <a href="{% url 'main:show_main' %}" class="nav-btn">Home</a>
+      <a href="{% url 'main:show_main' %}" class="nav-btn">Profile</a>
       <a href="{% url 'main:show_experience' %}" class="nav-btn active">Experience</a>
+      <a href="{% url 'main:show_education' %}" class="nav-btn">Education</a>
       <a href="{% url 'main:show_main' %}#about-detail" class="nav-btn">About</a>
-      <a href="{% url 'main:show_main' %}#projects-preview-section" class="nav-btn">Projects</a>
       <a href="{% url 'main:show_main' %}#snapshots" class="nav-btn">Snaps</a>
       <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
     </nav>
