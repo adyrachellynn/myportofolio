@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Education - {{ name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+
+  <!-- Floating Pill Navbar -->
+  <header class="navbar-wrapper">
+    <div class="brand-side">
+      <a href="{% url 'main:show_main' %}" class="brand-logo brand">{{ name }}<span>.</span></a>
+    </div>
+
+    <nav class="pill-nav" aria-label="Main Navigation">
+      <a href="{% url 'main:show_main' %}" class="nav-btn">Home</a>
+      <a href="{% url 'main:show_experience' %}" class="nav-btn">Experience</a>
+      <a href="{% url 'main:show_education' %}" class="nav-btn active">Education</a>
+      <a href="{% url 'main:show_main' %}#about-detail" class="nav-btn">About</a>
+      <a href="{% url 'main:show_main' %}#snapshots" class="nav-btn">Snaps</a>
+      <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
+    </nav>
+  </header>
+
+  <!-- Halaman Khusus Education -->
+  <main class="page-container" id="main-content" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 60px;">
+    <section class="experience-section" id="education" style="border-top: none; padding: 0;">
+      <div class="container">
+        <p class="section-kicker">Latar Belakang Akademik & Sertifikasi</p>
+        <h1 class="section-big-title" style="font-size: 2.25rem; font-weight: 800; margin: 0.25rem 0 2rem;">Education<span>.</span></h1>
+
+        <div class="experience-grid">
+          {% for edu in education_list %}
+          <article class="experience-card" style="border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="experience-category">
+                {{ edu.get_category_display }}
+              </span>
+              <h2>{{ edu.title }}</h2>
+              <p style="font-weight: 600; color: #3b5042; margin-top: 4px;">{{ edu.institution }}</p>
+              {% if edu.description %}
+              <p class="experience-description" style="margin-top: 8px;">
+                {{ edu.description }}
+              </p>
+              {% endif %}
+            </div>
+            <div style="margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid var(--line, #f0ece1);">
+              <span style="font-size: 0.82rem; color: #8d8981; font-weight: 600;">Periode: {{ edu.year }}</span>
+            </div>
+          </article>
+          {% empty %}
+          <div class="empty-box" style="grid-column: 1 / -1; padding: 3rem 1.5rem; text-align: center; background: #ffffff; border: 1px dashed #d1ccc0; border-radius: 20px;">
+            <p class="empty-state" style="color: #8d8981; font-size: 0.95rem; margin: 0;">Belum ada data pendidikan yang ditambahkan.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+  </footer>
+
+</body>
+</html>
