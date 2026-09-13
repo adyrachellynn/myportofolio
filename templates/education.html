@@ -4,11 +4,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Education - {{ name }}</title>
+  <title>Education & Certifications - {{ name }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <style>
+    /* Bento Grid khusus Education */
+    .edu-bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 2rem;
+    }
+    .bento-card-edu {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle, #e6e2d8);
+      border-radius: 24px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+    }
+    .bento-card-edu:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    }
+    /* Hero Card untuk UI (Span 2 Kolom) */
+    .bento-card-edu.featured {
+      grid-column: span 2;
+      background: #1e1b18;
+      color: #ffffff;
+      border-color: #38342e;
+    }
+    .bento-card-edu.featured h2 {
+      color: #ffffff;
+      font-size: 1.5rem;
+    }
+    .bento-card-edu.featured .edu-inst {
+      color: #ffd000;
+    }
+    .bento-card-edu.featured .edu-desc {
+      color: #c4beb5;
+    }
+    .bento-card-edu.featured .pill-badge {
+      background: rgba(255, 208, 0, 0.15);
+      color: #ffd000;
+      border-color: rgba(255, 208, 0, 0.3);
+    }
+    .pill-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(59, 80, 66, 0.08);
+      color: #3b5042;
+      border: 1px solid rgba(59, 80, 66, 0.15);
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+    .edu-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1.3;
+      margin: 0 0 6px 0;
+      color: #141413;
+    }
+    .edu-inst {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #c97a56;
+      margin: 0 0 12px 0;
+    }
+    .edu-desc {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #6b6863;
+      margin: 0;
+    }
+    .edu-footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f0ece1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #8d8981;
+    }
+    .bento-card-edu.featured .edu-footer {
+      border-top-color: #38342e;
+      color: #9c968d;
+    }
+    @media (max-width: 900px) {
+      .edu-bento-grid {
+        grid-template-columns: 1fr;
+      }
+      .bento-card-edu.featured {
+        grid-column: span 1;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -18,7 +120,7 @@
       <a href="{% url 'main:show_main' %}" class="brand-logo brand">{{ name }}<span>.</span></a>
     </div>
 
-    <nav class="pill-nav" aria-label="Main Navigation">
+  <nav class="pill-nav" aria-label="Main Navigation">
       <a href="{% url 'main:show_main' %}" class="nav-btn">Home</a>
       <a href="{% url 'main:show_experience' %}" class="nav-btn">Experience</a>
       <a href="{% url 'main:show_education' %}" class="nav-btn active">Education</a>
@@ -29,37 +131,52 @@
   </header>
 
   <!-- Halaman Khusus Education -->
-  <main class="page-container" id="main-content" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 60px;">
-    <section class="experience-section" id="education" style="border-top: none; padding: 0;">
+  <main class="page-container" id="main-content" style="max-width: 1160px; margin: 0 auto; padding: 120px 24px 80px;">
+    <section class="experience-section" style="border-top: none; padding: 0;">
       <div class="container">
-        <p class="section-kicker">Latar Belakang Akademik & Sertifikasi</p>
-        <h1 class="section-big-title" style="font-size: 2.25rem; font-weight: 800; margin: 0.25rem 0 2rem;">Education<span>.</span></h1>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 10px;">
+          <div>
+            <p class="section-kicker" style="margin: 0 0 6px 0;">ACADEMIC & LEARNING MATRIX</p>
+            <h1 class="section-big-title" style="font-size: 2.35rem; font-weight: 800; margin: 0;">Education & Certs<span>.</span></h1>
+          </div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: #3b5042; background: rgba(59, 80, 66, 0.08); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(59, 80, 66, 0.15);">
+            ✦ Continuous Upskilling
+          </span>
+        </div>
 
-        <div class="experience-grid">
+        <div class="edu-bento-grid">
           {% for edu in education_list %}
-          <article class="experience-card" style="border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <article class="bento-card-edu {% if 'Universitas Indonesia' in edu.institution %}featured{% endif %}">
             <div>
-              <span class="experience-category">
+              <span class="pill-badge">
                 {{ edu.get_category_display }}
               </span>
-              <h2>{{ edu.title }}</h2>
-              <p style="font-weight: 600; color: #3b5042; margin-top: 4px;">{{ edu.institution }}</p>
+              <h2 class="edu-title">{{ edu.title }}</h2>
+              <p class="edu-inst">{{ edu.institution }}</p>
               {% if edu.description %}
-              <p class="experience-description" style="margin-top: 8px;">
+              <p class="edu-desc">
                 {{ edu.description }}
               </p>
               {% endif %}
             </div>
-            <div style="margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid var(--line, #f0ece1);">
-              <span style="font-size: 0.82rem; color: #8d8981; font-weight: 600;">Periode: {{ edu.year }}</span>
+
+            <div class="edu-footer">
+              <span>Timeline: {{ edu.year }}</span>
+              {% if 'Universitas Indonesia' in edu.institution %}
+                <span style="color: #ffd000; font-weight: 700;">★ Active Scholar</span>
+              {% else %}
+                <span>Verified Credential ↗</span>
+              {% endif %}
             </div>
           </article>
           {% empty %}
-          <div class="empty-box" style="grid-column: 1 / -1; padding: 3rem 1.5rem; text-align: center; background: #ffffff; border: 1px dashed #d1ccc0; border-radius: 20px;">
-            <p class="empty-state" style="color: #8d8981; font-size: 0.95rem; margin: 0;">Belum ada data pendidikan yang ditambahkan.</p>
+          <div style="grid-column: 1 / -1; padding: 3.5rem 1.5rem; text-align: center; background: #ffffff; border: 1px dashed #d1ccc0; border-radius: 24px;">
+            <p style="color: #8d8981; font-size: 0.95rem; margin: 0;">Belum ada data pendidikan yang ditambahkan.</p>
           </div>
           {% endfor %}
         </div>
+
       </div>
     </section>
   </main>
