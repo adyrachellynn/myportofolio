@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<title>Projects - {{ name }}</title>
+<style>
+  /* Layout Page Container agar sejajar dengan Experience */
+  .projects-wrapper {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    box-sizing: border-box;
+  }
+  
+  /* CSS Resmi Modul Tutorial 03 */
+  .project-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .project-header h1 {
+    font-size: 2.35rem;
+    font-weight: 800;
+    margin: 0;
+    color: #141413;
+  }
+  .section-kicker {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8d8981;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+  }
+  .project-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .project-add-button span {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .project-search {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .project-search__input {
+    width: 100%;
+    max-width: 420px;
+    padding: 0.7rem 1.2rem;
+    border: 1px solid #e6e2d8;
+    border-radius: 999px;
+    background: #fff;
+    color: #141413;
+    font: inherit;
+    outline: none;
+  }
+  .project-search__input:focus {
+    border-color: #141413;
+  }
+  .button {
+    display: inline-block;
+    height: fit-content;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.65rem 1.25rem;
+    background: #141413;
+    color: #ffffff !important;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: background 0.2s ease;
+  }
+  .button:hover {
+    background: #333333;
+  }
+  .button-danger {
+    background: #b42318 !important;
+  }
+  .button-secondary {
+    background: #fff !important;
+    color: #555 !important;
+    border: 1px solid #d1ccc0 !important;
+  }
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .experience-card {
+    background: #ffffff;
+    border: 1px solid #e6e2d8;
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  }
+  .experience-card h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    color: #141413;
+  }
+  .experience-category {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(59, 80, 66, 0.08);
+    color: #3b5042;
+    border: 1px solid rgba(59, 80, 66, 0.15);
+    margin-bottom: 12px;
+    width: fit-content;
+  }
+  .experience-description {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #6b6863;
+    margin: 0;
+  }
+  .project-image {
+    display: block;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 1rem;
+    border: 1px solid #f0ece1;
+  }
+  .project-card-actions {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    padding-top: 1.25rem;
+  }
+  .project-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .project-actions .experience-status {
+    margin: 0;
+  }
+  .empty-state {
+    grid-column: 1 / -1;
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    background: #ffffff;
+    border: 1px dashed #d1ccc0;
+    border-radius: 24px;
+    color: #8d8981;
+  }
+  
+  /* Popover Modal Hapus */
+  .project-delete-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 1rem;
+    border: 0;
+    background: transparent;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .project-delete-modal:popover-open {
+    display: flex;
+  }
+  .project-delete-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: rgba(28, 25, 23, 0.58);
+    cursor: default;
+  }
+  .project-delete-modal__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 460px);
+    padding: 2rem;
+    background: #ffffff;
+    border: 1px solid #e6e2d8;
+    border-radius: 24px;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+  }
+  .project-delete-modal__content h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+  .project-delete-modal__close {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    border: 0;
+    background: transparent;
+    color: #8d8981;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .project-delete-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock meta %}
+
+{% block content %}
+<main class="page-container" id="main-content">
+  <div class="projects-wrapper">
+    <section class="experience-section" id="experience" style="border: none; padding: 0;">
+      <p class="section-kicker">Karya yang saya bangun</p>
+      <div class="project-header">
+        <h1>Projects<span>.</span></h1>
+        <a href="{% url 'main:create_project' %}" class="button project-add-button">
+          <span aria-hidden="true">+</span> Tambah Proyek
+        </a>
+      </div>
+
+      <form method="get" action="{% url 'main:show_projects' %}" class="project-search">
+        <input type="search"
+               name="title"
+               value="{{ title_query }}"
+               placeholder="Cari berdasarkan nama proyek..."
+               class="project-search__input"
+               aria-label="Cari berdasarkan nama proyek">
+        <button type="submit" class="button">Cari</button>
+      </form>
+
+      <div class="experience-grid project-grid">
+        {% for project in project_list %}
+          <article class="experience-card">
+            {% if project.project_image_url %}
+              <img src="{{ project.project_image_url }}"
+                   alt="Gambar {{ project.title }}"
+                   class="project-image">
+            {% endif %}
+            <h2>{{ project.title }}</h2>
+            <span class="experience-category">{{ project.tech_stack }}</span>
+            <p class="experience-description">{{ project.description }}</p>
+            <div class="project-card-actions">
+              <div class="project-actions">
+                {% if project.project_url %}
+                  <a href="{{ project.project_url }}" target="_blank" rel="noopener noreferrer" class="button">Lihat Project</a>
+                {% endif %}
+                {% include "components/project_delete_modal.html" with project=project %}
+              </div>
+            </div>
+          </article>
+        {% empty %}
+          <div class="empty-state">
+            {% if title_query %}
+              <p style="margin:0;">Tidak ada proyek dengan nama <strong>"{{ title_query }}"</strong>.</p>
+            {% else %}
+              <p style="margin:0;">Belum ada proyek yang ditambahkan.</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock content %}

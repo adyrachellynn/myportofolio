@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3.0">
+  {% block meta %} {% endblock meta %}
+</head>
+<body>
+
+  <!-- Floating Pill Navbar Asli Adyra -->
+  <header class="navbar-wrapper">
+    <div class="brand-side">
+      <a href="{% url 'main:show_main' %}" class="brand-logo brand">Adyra<span>.</span></a>
+    </div>
+
+    <nav class="pill-nav" aria-label="Main Navigation">
+      <a href="{% url 'main:show_main' %}" class="nav-btn {% if request.resolver_match.url_name == 'show_main' %}active{% endif %}">Profile</a>
+      <a href="{% url 'main:show_experience' %}" class="nav-btn {% if request.resolver_match.url_name == 'show_experience' %}active{% endif %}">Experience</a>
+      <a href="{% url 'main:show_education' %}" class="nav-btn {% if request.resolver_match.url_name == 'show_education' %}active{% endif %}">Education</a>
+      <a href="{% url 'main:show_projects' %}" class="nav-btn {% if 'project' in request.resolver_match.url_name %}active{% endif %}">Projects</a>
+      <a href="{% url 'main:show_main' %}#about-detail" class="nav-btn">About</a>
+      <a href="{% url 'main:show_main' %}#snapshots" class="nav-btn">Snaps</a>
+      <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
+    </nav>
+  </header>
+
+  {% block content %}
+  {% endblock content %}
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Adyra Rachellyn. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+  </footer>
+</body>
+</html>
