@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<title>{% if education %}Edit Education{% else %}Add Education{% endif %} - {{ name }}</title>
+{% endblock meta %}
+
+{% block content %}
+<main>
+  <div class="form-container">
+    <div class="form-header">
+      <p style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: #8d8981; font-weight: 700; margin-bottom: 0.25rem;">MANAJEMEN PENDIDIKAN</p>
+      <h1>{% if education %}Edit Education.{% else %}Add Education.{% endif %}</h1>
+      <p>Perbarui rekam jejak akademik dan sertifikasi Anda.</p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Nama Gelar / Sertifikasi</label>
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="error-text">{{ form.title.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.institution.id_for_label }}">Institusi / Penyelenggara</label>
+        {{ form.institution }}
+        {% if form.institution.errors %}
+          <div class="error-text">{{ form.institution.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.year.id_for_label }}">Tahun / Periode</label>
+        {{ form.year }}
+        {% if form.year.errors %}
+          <div class="error-text">{{ form.year.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.category.id_for_label }}">Kategori</label>
+        {{ form.category }}
+        {% if form.category.errors %}
+          <div class="error-text">{{ form.category.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Deskripsi</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="error-text">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div style="display: flex; gap: 1rem; align-items: center; margin-top: 2rem;">
+        <button type="submit" class="button">{% if education %}Simpan Perubahan{% else %}Tambah Data{% endif %}</button>
+        <a href="{% url 'main:show_education' %}" style="text-decoration: none; color: #6b6863; font-weight: 600;">Batal</a>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock content %}

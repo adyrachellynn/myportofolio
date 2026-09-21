@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
 from main.models import Experience, Education, Project
-from main.forms import ProjectForm
+from main.forms import ProjectForm, EducationForm
 
 def show_main(request):
     context = {
@@ -24,13 +24,7 @@ def show_experience(request):
     }
     return render(request, "experience.html", context)
 
-def show_education(request):
-    education_list = Education.objects.all()
-    context = {
-        "name": "Adyra",
-        "education_list": education_list,
-    }
-    return render(request, "education.html", context)
+# --- PROJECTS (TUTORIAL 03) ---
 
 def create_project(request):
     form = ProjectForm(request.POST or None)
@@ -71,3 +65,54 @@ def delete_project(request, project_id):
         messages.success(request, "Project berhasil dihapus!")
         return redirect("main:show_projects")
     return redirect("main:show_projects")
+
+# --- EDUCATION (INDIVIDUAL ASSIGNMENT 3) ---
+
+def create_education(request):
+    form = EducationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Education berhasil ditambahkan!")
+        return redirect("main:show_education")
+    context = {
+        "name": "Adyra Rachellyn Arkossand",
+        "form": form,
+    }
+    return render(request, "education_form.html", context)
+
+def edit_education(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+    form = EducationForm(request.POST or None, instance=education)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Education berhasil diperbarui!")
+        return redirect("main:show_education")
+    context = {
+        "name": "Adyra Rachellyn Arkossand",
+        "form": form,
+        "education": education,
+    }
+    return render(request, "education_form.html", context)
+
+def get_education_json(request):
+    education_data = Education.objects.all()
+    education_json = serializers.serialize("json", education_data)
+    return HttpResponse(education_json, content_type="application/json")
+
+def show_education(request):
+    json_response = get_education_json(request)
+    edu_objects = serializers.deserialize("json", json_response.content.decode("utf-8"))
+    education_list = [item.object for item in edu_objects]
+    context = {
+        "name": "Adyra Rachellyn Arkossand",
+        "education_list": education_list,
+    }
+    return render(request, "education.html", context)
+
+def delete_education(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+    if request.method == "POST":
+        education.delete()
+        messages.success(request, "Education berhasil dihapus!")
+        return redirect("main:show_education")
+    return redirect("main:show_education")
