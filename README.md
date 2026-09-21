@@ -195,3 +195,75 @@ Dalam pengerjaan Tugas 2, saya menggunakan asisten AI (Gemini) sebagai rekan dis
   *Aksi*: Beralih dari kartu berpetak ke layout editorial timeline dua sisi (metadata status di kiri, rincian peran di kanan).
 * *Prompt*: *"tp jujur td di css experience nya sia sia ya. diapus aja kan"*  
   *Aksi*: Membersihkan *dead code* di `style.css` agar berkas CSS tetap ringkas.
+
+
+### Tugas 3
+
+#### 1. Kenapa lebih baik pakai ModelForm daripada form HTML manual, dan kenapa harus ada `{% csrf_token %}`?
+
+**ModelForm**
+Menurut saya, penggunaan ModelForm lebih praktis karena kita tidak perlu membuat tag `<input>` satu per satu secara manual di HTML. ModelForm bisa langsung dihubungkan dengan model yang kita gunakan, misalnya Education atau Project.
+
+Selain itu, ModelForm juga sudah membantu dalam proses validasi data, seperti tipe data, batas karakter, dan pesan error. Kalau datanya sudah benar, kita juga bisa langsung menyimpannya ke database menggunakan `.save()`.
+Jadi, penggunaan ModelForm membuat kode lebih singkat, rapi, dan mengurangi kemungkinan salah saat menulis form secara manual.
+
+**`{% csrf_token %}`**
+`{% csrf_token %}` digunakan untuk keamanan website, khususnya untuk mencegah serangan Cross-Site Request Forgery (CSRF).
+Sederhananya, token ini digunakan untuk memastikan bahwa request yang dikirim, terutama melalui metode POST, memang berasal dari form yang ada di website kita dan bukan dari website lain yang mencoba mengirim request secara sembarangan.
+Jadi, saat membuat form yang melakukan perubahan atau penyimpanan data, penggunaan `{% csrf_token %}` itu penting supaya aplikasi Django lebih aman.
+
+---
+
+#### 2. Kenapa JSON lebih sering digunakan di web modern dibandingkan XML?
+Ada beberapa alasan kenapa JSON lebih banyak digunakan sekarang:
+- **Lebih sederhana dan ringkas.** JSON menggunakan format key-value sehingga penulisannya biasanya lebih pendek dibandingkan XML yang menggunakan banyak tag pembuka dan penutup.
+- **Mudah diproses oleh JavaScript.** JSON cocok digunakan dengan JavaScript karena formatnya memang sangat dekat dengan struktur data yang digunakan dalam JavaScript.
+- **Banyak digunakan untuk API.** Saat ini JSON sering menjadi format pertukaran data antara backend dengan frontend, mobile app, maupun layanan lainnya.
+
+Jadi, JSON banyak dipilih karena formatnya lebih sederhana, mudah dibaca, dan praktis untuk digunakan dalam komunikasi antar aplikasi.
+
+---
+
+#### 3. Bagaimana alur fungsi view saat mengembalikan data JSON, dan kenapa model Django harus diserialisasi terlebih dahulu?
+
+**Alur datanya**
+Secara sederhana, prosesnya seperti ini:
+1. Browser atau client mengirim request GET ke URL endpoint, misalnya `/api/education/`.
+2. View menerima request tersebut dan mengambil data dari database menggunakan QuerySet, contohnya `Education.objects.all()`.
+3. Data yang didapat kemudian diserialisasi menggunakan `serializers.serialize("json", ...)`.
+4. Hasil serialisasi berupa data JSON kemudian dikirim kembali menggunakan `HttpResponse` dengan tipe konten `application/json`.
+5. Browser atau client menerima data tersebut dan bisa menggunakannya sesuai kebutuhan.
+
+**Kenapa harus diserialisasi?**
+QuerySet dari Django sebenarnya masih berupa objek Python. Data dalam bentuk objek Python tidak bisa langsung dikirim melalui HTTP sebagai data yang bisa dipahami oleh aplikasi lain.
+Karena itu, data tersebut perlu diserialisasi terlebih dahulu, yaitu diubah dari objek Python menjadi format yang umum digunakan untuk pertukaran data, dalam hal ini JSON.
+Dengan begitu, data dari database bisa dikirim melalui HTTP dan lebih mudah dibaca oleh browser, frontend, atau aplikasi lain.
+
+---
+
+### Screenshot Prompting Penggunaan AI
+Saya menggunakan Gemini  sebagai tools pembantu untuk beberapa bagian spesifik berikut terkait pengerjaan Tugas 3.
+
+#### 1. Memeriksa bagian yang salah di bagian menambahkan ModelForm baru.
+Prompt:
+•⁠  ⁠aku mau nambahin education sebagai ModelForms baru, ini knp ya kok masih salah
+
+Hasil dari AI:
+Screenshoot chat bisa diakses ![disini](Dokumentasi%20AI%20Tugas%203/No_1.jpeg) (arahkan kursor ke link)
+•⁠  ⁠AI tidak menemukan kesalahan logika yang pasti dari potongan kode tersebut, tetapi menunjukkan kemungkinan masalah indentasi.
+
+#### 2. Memperbaiki EducationForm
+Prompt:
+•⁠  ⁠form buat education ini aku adaptasi dari ProjectForm. coba cek in apakah masih ada judul, action, atau link yang salah mengarah ke file project
+
+Hasil dari AI:
+Screenshoot chat bisa diakses ![disini](Dokumentasi%20AI%20Tugas%203/No_2.jpeg) (arahkan kursor ke link)
+•⁠  ⁠Ada satu bagian yang perlu disesuaikan: class pada section masih project-section.
+
+#### 3. Unit Test
+Prompt:
+•⁠  ⁠aku kan ada tambahan fitur ya di modelsform juga, jadinya test nya ada yg gagal gitu, coba kurang apa ya ini
+
+Hasil dari AI:
+Screenshoot chat bisa diakses ![disini](Dokumentasi%20AI%20Tugas%203/No_3.jpeg) (arahkan kursor ke link)
+•⁠  ⁠data pendidikan tetap tampil tanpa keterangan periode, sesuai perubahan kode saya yang mana tidak mencantumkan started at dan ended at sebagai timestamp.
