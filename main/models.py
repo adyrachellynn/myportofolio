@@ -41,10 +41,12 @@ class Education(models.Model):
     year = models.CharField(max_length=50)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='formal')
     description = models.TextField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+
 
     def __str__(self):
         return f"{self.title} - {self.institution}"
-        
+
 class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
