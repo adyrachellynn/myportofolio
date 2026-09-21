@@ -50,3 +50,50 @@ class ProjectForm(ModelForm):
                 }
             ),
         }
+
+class EducationForm(ModelForm):
+    class Meta:
+        model = Education
+        fields = [
+            "title",
+            "institution",
+            "year",
+            "category",
+            "description",
+        ]
+
+        labels = {
+            "title": "Nama Gelar / Sertifikasi",
+            "institution": "Institusi / Penyelenggara",
+            "year": "Tahun / Periode",
+            "category": "Kategori",
+            "description": "Deskripsi",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "S1 Sistem Informasi",
+                    "maxlength": 255,
+                }
+            ),
+            "institution": TextInput(
+                attrs={
+                    "placeholder": "Universitas Indonesia",
+                    "maxlength": 255,
+                }
+            ),
+            "year": TextInput(
+                attrs={
+                    "placeholder": "2024 - Sekarang",
+                    "maxlength": 50,
+                }
+            ),
+            "category": Select(),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Ceritakan fokus studi, topik riset, atau pencapaianmu...",
+                    "rows": 3,
+                }
+            ),
+        }
