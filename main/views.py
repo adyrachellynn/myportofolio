@@ -4,11 +4,13 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core import serializers
 from django.http import HttpResponse
+from django.utils import timezone
 from main.models import Experience, Education, Project
 from main.forms import ProjectForm, EducationForm
 
 def show_main(request):
     context = {
+        "last_login": request.COOKIES.get("last_login") or "Belum ada sesi login / Cookie tidak tersedia",
         "name": "Adyra Rachellyn Arkossand",  
         "npm": "2506620620",  
         "study_program": "S1 Sistem Informasi",
@@ -138,7 +140,12 @@ def login_user(request):
     )
     if request.method == "POST" and form.is_valid():
         login(request, form.get_user())
-        return redirect("main:show_main")
+        response = redirect("main:show_main")
+        response.set_cookie(
+            "last_login", timezone.localtime().strftime("%Y-%m-%d %H:%M:%S"),
+            httponly=True, samesite="Lax", secure=request.is_secure(),
+        )
+        return response
     return render(request, "login.html", {
         "name": "Adyra Rachellyn Arkossand", "form": form,
     })
@@ -146,4 +153,6 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect("main:show_main")
+    response = redirect("main:show_main")
+    response.delete_cookie("last_login", samesite="Lax")
+    return response

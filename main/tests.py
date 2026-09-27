@@ -143,3 +143,41 @@ class AuthenticationTest(TestCase):
             response = client.get(reverse("main:" + page))
             self.assertContains(response, "csrfmiddlewaretoken")
             self.assertEqual(client.post(reverse("main:" + page), {}).status_code, 403)
+
+
+class LoginCookieTest(TestCase):
+    def setUp(self):
+        from django.contrib.auth.models import User
+        User.objects.create_user("cookievisitor", password="Test-password-482!")
+
+    def test_cookie_lifecycle(self):
+        from unittest.mock import patch
+        import datetime
+        self.assertContains(self.client.get(reverse("main:show_main")), "Belum ada sesi login")
+        with patch("main.views.timezone.localtime", return_value=datetime.datetime(2026, 9, 27, 20, 30, 45)):
+            response = self.client.post(reverse("main:login"), {
+                "username": "cookievisitor", "password": "Test-password-482!",
+            })
+        cookie = response.cookies["last_login"]
+        self.assertEqual(cookie.value, "2026-09-27 20:30:45")
+        self.assertEqual(cookie["max-age"], "")
+        self.assertEqual(cookie["samesite"], "Lax")
+        self.assertTrue(cookie["httponly"])
+        self.assertIn("sessionid", response.cookies)
+        self.assertContains(self.client.get(reverse("main:show_main")), cookie.value)
+        response = self.client.get(reverse("main:logout"))
+        self.assertEqual(response.cookies["last_login"]["max-age"], 0)
+        self.assertEqual(response.cookies["sessionid"]["max-age"], 0)
+        self.assertContains(self.client.get(reverse("main:show_main")), "Belum ada sesi login")
+
+    def test_failed_login_does_not_issue_cookie(self):
+        response = self.client.post(reverse("main:login"), {
+            "username": "cookievisitor", "password": "wrong",
+        })
+        self.assertNotIn("last_login", response.cookies)
+
+    def test_cookie_is_display_only_and_escaped(self):
+        self.client.cookies["last_login"] = "<script>alert(1)</script>"
+        response = self.client.get(reverse("main:show_main"))
+        self.assertContains(response, "&lt;script&gt;")
+        self.assertFalse(response.context["user"].is_authenticated)
