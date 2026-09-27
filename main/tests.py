@@ -181,3 +181,114 @@ class LoginCookieTest(TestCase):
         response = self.client.get(reverse("main:show_main"))
         self.assertContains(response, "&lt;script&gt;")
         self.assertFalse(response.context["user"].is_authenticated)
+
+
+class ProjectAuthorizationTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from django.contrib.auth.models import User
+        from main.models import Project
+        cls.member = User.objects.create_user("member")
+        cls.other = User.objects.create_user("other")
+        cls.owner = User.objects.create_superuser("owner", "owner@example.com", "Test-password-482!")
+        cls.project = Project.objects.create(title="Portfolio", description="My work", tech_stack="Django")
+
+    def project_url(self, action):
+        return reverse("main:" + action, args=[self.project.pk])
+
+    def test_public_pages_and_controls(self):
+        for user in [None, self.member, self.owner]:
+            with self.subTest(user=user):
+                if user:
+                    self.client.force_login(user)
+                response = self.client.get(reverse("main:show_projects"))
+                self.assertContains(response, "Portfolio")
+                self.assertContains(response, self.project_url("toggle_star"))
+                for url in [reverse("main:create_project"), self.project_url("delete_project")]:
+                    if user == self.owner:
+                        self.assertContains(response, url)
+                    else:
+                        self.assertNotContains(response, url)
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse("main:get_projects_json")).status_code, 200)
+
+    def test_anonymous_mutations_redirect_to_login(self):
+        from main.models import Project
+        for url in [reverse("main:create_project"), self.project_url("delete_project"), self.project_url("toggle_star")]:
+            for method in [self.client.get, self.client.post]:
+                response = method(url)
+                self.assertRedirects(response, reverse("main:login") + "?next=" + url)
+        self.assertEqual(Project.objects.count(), 1)
+        self.assertEqual(self.project.starred_by.count(), 0)
+
+    def test_member_cannot_create_or_delete_even_with_forged_cookie(self):
+        from main.models import Project
+        self.client.force_login(self.member)
+        self.client.cookies["last_login"] = "owner"
+        for url in [reverse("main:create_project"), self.project_url("delete_project")]:
+            for method in [self.client.get, self.client.post]:
+                self.assertEqual(method(url, {"title": "Forbidden"}).status_code, 403)
+        self.assertEqual(Project.objects.count(), 1)
+
+    def test_owner_can_create_and_delete_but_get_does_not_delete(self):
+        from main.models import Project
+        self.client.force_login(self.owner)
+        self.assertEqual(self.client.get(reverse("main:create_project")).status_code, 200)
+        response = self.client.post(reverse("main:create_project"), {
+            "title": "New project", "description": "A new work", "tech_stack": "Python",
+        })
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.assertTrue(Project.objects.filter(title="New project").exists())
+        self.client.get(self.project_url("delete_project"))
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+        self.client.post(self.project_url("delete_project"))
+        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
+
+    def test_star_unstar_are_per_user_and_visible_in_api(self):
+        for user in [self.member, self.other, self.owner]:
+            self.client.force_login(user)
+            self.assertRedirects(self.client.post(self.project_url("toggle_star")), reverse("main:show_projects"))
+        self.assertEqual(self.project.starred_by.count(), 3)
+        self.assertIn(self.project, self.member.starred_projects.all())
+        response = self.client.get(reverse("main:show_projects"))
+        self.assertContains(response, "Unstar")
+        self.assertContains(response, 'class="star-count">3</span>')
+        self.assertContains(response, "Dibintangi oleh")
+        fields = self.client.get(reverse("main:get_projects_json")).json()[0]["fields"]
+        self.assertCountEqual(fields["starred_by"], [["member"], ["other"], ["owner"]])
+        self.client.post(self.project_url("toggle_star"))
+        self.assertFalse(self.project.starred_by.filter(pk=self.owner.pk).exists())
+        self.assertEqual(self.project.starred_by.count(), 2)
+        self.assertNotContains(self.client.get(reverse("main:show_projects")), "Unstar")
+
+    def test_get_star_does_not_mutate_and_missing_project_is_404(self):
+        import uuid
+        self.client.force_login(self.member)
+        self.client.get(self.project_url("toggle_star"))
+        self.assertEqual(self.project.starred_by.count(), 0)
+        self.assertEqual(self.client.post(reverse("main:toggle_star", args=[uuid.uuid4()])).status_code, 404)
+
+    def test_project_search_still_filters_page_and_api(self):
+        for page in ["show_projects", "get_projects_json"]:
+            self.assertContains(self.client.get(reverse("main:" + page), {"title": "folio"}), "Portfolio")
+            response = self.client.get(reverse("main:" + page), {"title": "absent"})
+            if page == "get_projects_json":
+                self.assertEqual(response.json(), [])
+            else:
+                self.assertNotContains(response, self.project_url("toggle_star"))
+
+    def test_mutations_require_csrf_and_accept_valid_token(self):
+        from django.test import Client
+        from main.models import Project
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.owner)
+        for url in [reverse("main:create_project"), self.project_url("delete_project"), self.project_url("toggle_star")]:
+            self.assertEqual(client.post(url, {}).status_code, 403)
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+        self.assertEqual(self.project.starred_by.count(), 0)
+        client.get(reverse("main:show_projects"))
+        response = client.post(self.project_url("toggle_star"), {
+            "csrfmiddlewaretoken": client.cookies["csrftoken"].value,
+        })
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.assertTrue(self.project.starred_by.filter(pk=self.owner.pk).exists())

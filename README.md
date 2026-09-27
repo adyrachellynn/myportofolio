@@ -269,3 +269,27 @@ Prompt:
 Hasil dari AI:
 Screenshoot chat bisa diakses ![Bukti AI 4](static/img/Bukti%20AI%204.png) (arahkan kursor ke link)
 •⁠  ⁠data pendidikan tetap tampil tanpa keterangan periode, sesuai perubahan kode saya yang mana tidak mencantumkan started at dan ended at sebagai timestamp.
+
+### Tutorial 4 — Autentikasi, cookie, dan otorisasi Projects
+
+Jalankan dari direktori yang berisi `manage.py` menggunakan virtual environment lokal:
+
+```sh
+source env/bin/activate
+export PRODUCTION=False
+python manage.py migrate
+python manage.py test
+python manage.py createsuperuser  # bila belum memiliki akun pemilik lokal
+python manage.py runserver
+```
+
+Buka http://127.0.0.1:8000/ dan coba alur berikut:
+
+1. Tanpa login, halaman profil, Experience, Education, Projects, dan API tetap bisa dibaca. Navbar menampilkan Login/Register. Tombol tambah/hapus proyek tidak tampil; tombol Star mengarahkan ke login.
+2. Daftar di `/register/`. Konfirmasi password berbeda atau username duplikat menampilkan error. Registrasi valid mengarah ke `/login/`, tanpa memberikan hak superuser.
+3. Login dengan akun biasa. Username muncul di navbar; profil tetap milik Adyra. `Sesi Terakhir Login` menampilkan waktu Jakarta. DevTools → Application/Storage → Cookies memuat `sessionid` dan `last_login`. Cookie `last_login` hanya untuk tampilan, bukan penentu hak akses.
+4. Di `/projects/`, klik Star dan Unstar. Jumlah star berubah; arahkan kursor ke tombol untuk melihat username pemberi star. Coba akun kedua untuk memastikan star tersimpan per akun. `/api/projects/` memuat username dalam `starred_by`, bukan ID pengguna.
+5. Akun biasa mendapat 403 saat membuka `/projects/add/` atau mengirim permintaan hapus langsung. Akun superuser dapat menambah dan menghapus proyek. Request GET ke URL hapus/star tidak mengubah data; form POST memakai token CSRF.
+6. Logout menghapus session dan cookie `last_login`, lalu navbar kembali menampilkan Login/Register. Login selalu kembali ke profil, mengikuti tutorial.
+
+Migration `0006_project_starred_by` menambahkan tabel relasi star tanpa menghapus proyek lama. Pembatasan Education untuk Individual Assignment 4 tidak termasuk implementasi Tutorial 4 ini. Test lama Education diselaraskan dengan label model yang sudah ada, `Formal Education`.

@@ -1514,3 +1514,19 @@ a.bento-snaps-preview {
 .form-help { font-size: 0.85rem; color: #555; }
 .errorlist { color: #b42318; }
 .form-message { padding: 0.75rem; background: #edf5eb; border-radius: 8px; }
+
+
+.star-form { display: inline; }
+.button-star {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--text-main);
+}
+.button-star.is-starred { background: var(--accent-orange); }
+.star-count {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.8rem;
+}
