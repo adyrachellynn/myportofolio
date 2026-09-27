@@ -26,6 +26,13 @@
       <a href="{% url 'main:show_main' %}#about-detail" class="nav-btn">About</a>
       <a href="{% url 'main:show_main' %}#snapshots" class="nav-btn">Snaps</a>
       <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
+      {% if user.is_authenticated %}
+        <span class="nav-user">{{ user.username }}</span>
+        <a href="{% url 'main:logout' %}" class="nav-btn">Logout</a>
+      {% else %}
+        <a href="{% url 'main:login' %}" class="nav-btn">Login</a>
+        <a href="{% url 'main:register' %}" class="nav-btn">Register</a>
+      {% endif %}
     </nav>
   </header>
 

@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core import serializers
 from django.http import HttpResponse
 from main.models import Experience, Education, Project
@@ -116,3 +118,32 @@ def delete_education(request, education_id):
         messages.success(request, "Education berhasil dihapus!")
         return redirect("main:show_education")
     return redirect("main:show_education")
+
+# --- AUTHENTICATION (TUTORIAL 04) ---
+
+def register(request):
+    form = UserCreationForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Akun berhasil dibuat. Silakan login.")
+        return redirect("main:login")
+    return render(request, "register.html", {
+        "name": "Adyra Rachellyn Arkossand", "form": form,
+    })
+
+
+def login_user(request):
+    form = AuthenticationForm(
+        request, data=request.POST if request.method == "POST" else None,
+    )
+    if request.method == "POST" and form.is_valid():
+        login(request, form.get_user())
+        return redirect("main:show_main")
+    return render(request, "login.html", {
+        "name": "Adyra Rachellyn Arkossand", "form": form,
+    })
+
+
+def logout_user(request):
+    logout(request)
+    return redirect("main:show_main")

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block meta %}<title>Buat Akun - {{ name }}</title>{% endblock meta %}
+{% block content %}
+<main>
+  <section class="form-container">
+    <div class="form-header"><h1>Buat Akun</h1></div>
+    {% for message in messages %}<p class="form-message" role="status">{{ message }}</p>{% endfor %}
+    <form method="post" action="{% url 'main:register' %}">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="form-help">{{ field.help_text }}</div>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn-submit">Daftar</button>
+    </form>
+    <p>Sudah punya akun? <a href="{% url 'main:login' %}">Login di sini</a>.</p>
+  </section>
+</main>
+{% endblock content %}

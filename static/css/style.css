@@ -1507,3 +1507,10 @@ a.bento-snaps-preview {
     text-align: center;
   }
 }
+
+/* Authentication controls share the existing portfolio styling. */
+.pill-nav { flex-wrap: wrap; }
+.nav-user { padding: 0.5rem; font-weight: 700; overflow-wrap: anywhere; }
+.form-help { font-size: 0.85rem; color: #555; }
+.errorlist { color: #b42318; }
+.form-message { padding: 0.75rem; background: #edf5eb; border-radius: 8px; }
