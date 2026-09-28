@@ -59,3 +59,41 @@ class EducationAccessTest(TestCase):
     def test_public_education_and_json_remain_readable(self):
         for name in ["show_education", "get_education_json"]:
             self.assertContains(self.client.get(reverse("main:" + name)), "Information Systems")
+
+    def test_editor_can_only_update(self):
+        from django.contrib.auth.models import Group
+        self.member.groups.add(Group.objects.create(name="Editor"))
+        self.client.force_login(self.member)
+        create, edit, delete = self.actions()
+        self.assertEqual(self.client.get(edit).status_code, 200)
+        self.assertRedirects(self.client.post(edit, self.payload()), reverse("main:show_education"))
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.title, "Updated degree")
+        for url in [create, delete]:
+            for method in [self.client.get, self.client.post]:
+                self.assertEqual(method(url, self.payload()).status_code, 403)
+        self.assertEqual(Education.objects.count(), 1)
+
+    def test_editor_membership_removal_revokes_edit_access(self):
+        from django.contrib.auth.models import Group
+        group = Group.objects.create(name="Editor")
+        self.member.groups.add(group)
+        self.client.force_login(self.member)
+        edit = self.actions()[1]
+        self.assertEqual(self.client.get(edit).status_code, 200)
+        self.member.groups.remove(group)
+        self.assertEqual(self.client.post(edit, self.payload()).status_code, 403)
+
+    def test_staff_or_similarly_named_group_is_not_editor(self):
+        from django.contrib.auth.models import Group
+        self.member.is_staff = True
+        self.member.save()
+        self.member.groups.add(Group.objects.create(name="editor"))
+        self.client.force_login(self.member)
+        self.assertEqual(self.client.post(self.actions()[1], self.payload()).status_code, 403)
+
+    def test_admin_exposes_user_and_group_management_to_owner(self):
+        self.client.force_login(self.owner)
+        for url in ["admin:auth_group_add", "admin:auth_user_change"]:
+            args = [self.member.pk] if url.endswith("change") else []
+            self.assertEqual(self.client.get(reverse(url, args=args)).status_code, 200)

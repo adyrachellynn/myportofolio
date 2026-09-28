@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from main.models import Experience, Education, Project
 from main.forms import ProjectForm, EducationForm
+from main.permissions import can_edit_education
 
 def show_main(request):
     context = {
@@ -100,7 +101,7 @@ def create_education(request):
 
 @login_required(login_url="/login/")
 def edit_education(request, education_id):
-    if not request.user.is_superuser:
+    if not can_edit_education(request.user):
         raise PermissionDenied
 
     education = get_object_or_404(Education, pk=education_id)
