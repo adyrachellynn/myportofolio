@@ -7,6 +7,7 @@ from main.views import (
     edit_education,
     delete_education,
     get_education_json,
+    toggle_education_star,
     show_projects, 
     create_project, 
     get_projects_json, 
@@ -28,6 +29,7 @@ urlpatterns = [
     path("education/add/", create_education, name="create_education"),
     path("education/<uuid:education_id>/edit/", edit_education, name="edit_education"),
     path("education/<uuid:education_id>/delete/", delete_education, name="delete_education"),
+    path("education/<uuid:education_id>/star/", toggle_education_star, name="toggle_education_star"),
     path("api/education/", get_education_json, name="get_education_json"),
 
     path("projects/<uuid:project_id>/star/", toggle_star, name="toggle_star"),

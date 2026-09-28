@@ -7,6 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core import serializers
 from django.http import HttpResponse
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 from main.models import Experience, Education, Project
 from main.forms import ProjectForm, EducationForm
 from main.permissions import can_edit_education
@@ -118,8 +119,11 @@ def edit_education(request, education_id):
     return render(request, "education_form.html", context)
 
 def get_education_json(request):
-    education_data = Education.objects.all()
-    education_json = serializers.serialize("json", education_data)
+    education_data = Education.objects.prefetch_related("starred_by")
+    education_json = serializers.serialize(
+        "json", education_data, use_natural_foreign_keys=True,
+        fields=("title", "institution", "year", "category", "description", "image_url", "starred_by"),
+    )
     return HttpResponse(education_json, content_type="application/json")
 
 def show_education(request):
@@ -181,12 +185,23 @@ def logout_user(request):
     return response
 
 
-@login_required(login_url="main:login")
+@login_required(login_url="/login/")
+@require_POST
 def toggle_star(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
-    if request.method == "POST":
-        if project.starred_by.filter(pk=request.user.pk).exists():
-            project.starred_by.remove(request.user)
-        else:
-            project.starred_by.add(request.user)
+    if project.starred_by.filter(pk=request.user.pk).exists():
+        project.starred_by.remove(request.user)
+    else:
+        project.starred_by.add(request.user)
     return redirect("main:show_projects")
+
+
+@login_required(login_url="/login/")
+@require_POST
+def toggle_education_star(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+    if education.starred_by.filter(pk=request.user.pk).exists():
+        education.starred_by.remove(request.user)
+    else:
+        education.starred_by.add(request.user)
+    return redirect("main:show_education")

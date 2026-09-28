@@ -43,6 +43,9 @@ class Education(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='formal')
     description = models.TextField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
+    starred_by = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="starred_educations", blank=True,
+    )
 
 
     def __str__(self):
