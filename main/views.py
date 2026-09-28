@@ -82,7 +82,11 @@ def delete_project(request, project_id):
 
 # --- EDUCATION (INDIVIDUAL ASSIGNMENT 3) ---
 
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = EducationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -94,7 +98,11 @@ def create_education(request):
     }
     return render(request, "education_form.html", context)
 
+@login_required(login_url="/login/")
 def edit_education(request, education_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     education = get_object_or_404(Education, pk=education_id)
     form = EducationForm(request.POST or None, instance=education)
     if request.method == "POST" and form.is_valid():
@@ -123,7 +131,11 @@ def show_education(request):
     }
     return render(request, "education.html", context)
 
+@login_required(login_url="/login/")
 def delete_education(request, education_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     education = get_object_or_404(Education, pk=education_id)
     if request.method == "POST":
         education.delete()
