@@ -97,3 +97,21 @@ class EducationAccessTest(TestCase):
         for url in ["admin:auth_group_add", "admin:auth_user_change"]:
             args = [self.member.pk] if url.endswith("change") else []
             self.assertEqual(self.client.get(reverse(url, args=args)).status_code, 200)
+
+    def test_controls_follow_each_role(self):
+        from django.contrib.auth.models import Group
+        editor = User.objects.create_user("editor")
+        editor.groups.add(Group.objects.create(name="Editor"))
+        create, edit, delete = self.actions()
+        for user in [None, self.member, editor, self.owner]:
+            with self.subTest(user=user):
+                self.client.logout()
+                if user:
+                    self.client.force_login(user)
+                response = self.client.get(reverse("main:show_education"))
+                for url, allowed in [(create, user == self.owner), (edit, user in [editor, self.owner]), (delete, user == self.owner)]:
+                    if allowed:
+                        self.assertContains(response, url)
+                    else:
+                        self.assertNotContains(response, url)
+                self.assertContains(response, reverse("main:toggle_education_star", args=[self.education.pk]))

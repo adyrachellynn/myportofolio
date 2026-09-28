@@ -13,11 +13,16 @@
           <p class="section-kicker" style="margin: 0 0 6px 0;">ACADEMIC & LEARNING MATRIX</p>
           <h1 class="section-big-title" style="font-size: 2.35rem; font-weight: 800; margin: 0;">Education & Certs<span>.</span></h1>
         </div>
+        {% if user.is_superuser %}
         <a href="{% url 'main:create_education' %}" class="button" style="background: #141413; color: #ffffff !important; text-decoration: none; padding: 0.6rem 1.4rem; border-radius: 9999px; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
           <span>+</span> Tambah Pendidikan
         </a>
+        {% endif %}
       </div>
 
+      {% for message in messages %}
+        <p class="form-message" role="status">{{ message }}</p>
+      {% endfor %}
       <div class="edu-bento-grid">
         {% for edu in education_list %}
         <article class="bento-card-edu {% if 'Universitas Indonesia' in edu.institution %}featured{% endif %}">
@@ -38,12 +43,17 @@
           <div>
             <div class="edu-footer">
               <span>Timeline: {{ edu.year }}</span>
-              <div style="display: flex; gap: 8px; align-items: center;">
+              <div class="education-actions">
+                {% include "components/education_star.html" with education=edu %}
+                {% if can_edit_education %}
                 <a href="{% url 'main:edit_education' edu.id %}" style="font-size: 0.78rem; font-weight: 700; color: #141413; background: #ece8df; padding: 4px 10px; border-radius: 999px; text-decoration: none;">Edit</a>
-                <form method="post" action="{% url 'main:delete_education' edu.id %}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus {{ edu.title }}?');">
+                {% endif %}
+                {% if user.is_superuser %}
+                <form method="post" action="{% url 'main:delete_education' edu.id %}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus {{ edu.title|escapejs }}?');">
                   {% csrf_token %}
                   <button type="submit" style="font-size: 0.78rem; font-weight: 700; color: #ffffff; background: #b42318; padding: 4px 10px; border-radius: 999px; border: none; cursor: pointer;">Hapus</button>
                 </form>
+                {% endif %}
               </div>
             </div>
           </div>

@@ -70,3 +70,32 @@ class EducationStarTest(TestCase):
         response = client.post(self.url(), {"csrfmiddlewaretoken": client.cookies["csrftoken"].value})
         self.assertRedirects(response, reverse("main:show_education"))
         self.assertEqual(self.education.starred_by.count(), 1)
+
+    def test_star_status_count_and_username_tooltip(self):
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("main:show_education"))
+        self.assertContains(response, 'aria-pressed="false"')
+        self.assertContains(response, 'class="star-count">0</span>')
+        self.client.post(self.url())
+        response = self.client.get(reverse("main:show_education"))
+        self.assertContains(response, "Unstar")
+        self.assertContains(response, 'aria-pressed="true"')
+        self.assertContains(response, 'class="star-count">1</span>')
+        self.assertContains(response, "Dibintangi oleh member")
+        self.client.logout()
+        response = self.client.get(reverse("main:show_education"))
+        self.assertContains(response, 'aria-pressed="false"')
+        self.assertContains(response, 'class="star-count">1</span>')
+
+    def test_education_list_prefetches_stargazers(self):
+        from main.views import show_education
+        from django.test import RequestFactory
+        from django.contrib.auth.models import AnonymousUser
+        Education.objects.bulk_create([
+            Education(title=f"Degree {i}", institution="UI", year="2026") for i in range(5)
+        ])
+        request = RequestFactory().get("/education/")
+        request.user = AnonymousUser()
+        with self.assertNumQueries(2):
+            response = show_education(request)
+        self.assertEqual(response.status_code, 200)

@@ -1,0 +1,13 @@
+<form method="post" action="{% url 'main:toggle_education_star' education.id %}" class="star-form">
+  {% csrf_token %}
+  {% with stargazers=education.starred_by.all %}
+    <button type="submit"
+            class="button button-star{% if user in stargazers %} is-starred{% endif %}"
+            aria-pressed="{% if user in stargazers %}true{% else %}false{% endif %}"
+            title="{% if stargazers %}Dibintangi oleh {{ stargazers|join:', ' }}{% else %}Belum ada yang memberi star{% endif %}">
+      <span aria-hidden="true">★</span>
+      {% if user in stargazers %}Unstar{% else %}Star{% endif %}
+      <span class="star-count">{{ stargazers|length }}</span>
+    </button>
+  {% endwith %}
+</form>

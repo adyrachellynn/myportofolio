@@ -1572,3 +1572,15 @@ a.bento-snaps-preview {
 }
 
 .auth-switch a:hover { color: var(--accent-orange); }
+
+
+.education-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.edu-footer { flex-wrap: wrap; gap: 12px; }
+.education-actions .button-star { font-size: 0.78rem; padding: 0.4rem 0.75rem; }
+.button-star:focus-visible { outline: 3px solid var(--accent-orange); outline-offset: 3px; }

@@ -127,12 +127,11 @@ def get_education_json(request):
     return HttpResponse(education_json, content_type="application/json")
 
 def show_education(request):
-    json_response = get_education_json(request)
-    edu_objects = serializers.deserialize("json", json_response.content.decode("utf-8"))
-    education_list = [item.object for item in edu_objects]
+    education_list = Education.objects.prefetch_related("starred_by")
     context = {
         "name": "Adyra Rachellyn Arkossand",
         "education_list": education_list,
+        "can_edit_education": can_edit_education(request.user),
     }
     return render(request, "education.html", context)
 
