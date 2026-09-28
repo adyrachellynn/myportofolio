@@ -1,4 +1,4 @@
-{% load static %}
+{% load static role_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.2">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.3">
   {% block meta %} {% endblock meta %}
 </head>
 <body>
@@ -25,7 +25,11 @@
       <a href="{% url 'main:show_projects' %}" class="nav-btn {% if 'project' in request.resolver_match.url_name %}active{% endif %}">Projects</a>
       <a href="mailto:adyra.rachellyn@ui.ac.id" class="nav-btn contact-btn">Contact</a>
       {% if user.is_authenticated %}
-        <span class="nav-user">{{ user.username }}</span>
+        {% navbar_role user as role %}
+        <span class="nav-account">
+          <span class="nav-user">{{ user.username }}</span>
+          <span class="nav-role nav-role--{{ role|lower }}">{{ role }}</span>
+        </span>
         <a href="{% url 'main:logout' %}" class="nav-btn">Logout</a>
       {% else %}
         <a href="{% url 'main:login' %}" class="nav-btn">Login</a>

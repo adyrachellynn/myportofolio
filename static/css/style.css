@@ -1584,3 +1584,29 @@ a.bento-snaps-preview {
 .edu-footer { flex-wrap: wrap; gap: 12px; }
 .education-actions .button-star { font-size: 0.78rem; padding: 0.4rem 0.75rem; }
 .button-star:focus-visible { outline: 3px solid var(--accent-orange); outline-offset: 3px; }
+
+
+/* Keep the account name and its role together when navigation wraps. */
+.nav-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.nav-account .nav-user { min-width: 0; }
+
+.nav-role {
+  flex-shrink: 0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #ece8df;
+  color: var(--text-main);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.nav-role--editor { background: #fbe8df; color: #93391f; }
+.nav-role--admin { background: var(--text-main); color: #ffffff; }
