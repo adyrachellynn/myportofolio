@@ -270,26 +270,97 @@ Hasil dari AI:
 Screenshoot chat bisa diakses ![Bukti AI 4](static/img/Bukti%20AI%204.png) (arahkan kursor ke link)
 •⁠  ⁠data pendidikan tetap tampil tanpa keterangan periode, sesuai perubahan kode saya yang mana tidak mencantumkan started at dan ended at sebagai timestamp.
 
-### Tutorial 4 — Autentikasi, cookie, dan otorisasi Projects
+---
 
-Jalankan dari direktori yang berisi `manage.py` menggunakan virtual environment lokal:
+### Tugas 4
 
-```sh
-source env/bin/activate
-export PRODUCTION=False
-python manage.py migrate
-python manage.py test
-python manage.py createsuperuser  # bila belum memiliki akun pemilik lokal
-python manage.py runserver
+Pada Tugas 4, saya menambahkan fitur authentication, session, cookie, dan authorization pada website portofolio. Fitur ini diterapkan pada bagian Education agar setiap user punya akses yang berbeda sesuai role-nya. 
+
+Saya menggunakan bantuan AI Chat GPT selama proses tugas 4 ini.
+
+#### Implementasi Fitur
+
+**1. Authentication**
+
+Saya menambahkan fitur Register, Login, dan Logout menggunakan sistem autentikasi bawaan Django.
+
+Setelah user login, navbar akan menampilkan username dan tombol Logout. Kalau belum login, navbar akan menampilkan tombol Login dan Register.
+
+Saya juga menambahkan cookie `last_login` untuk menampilkan waktu terakhir user login. Cookie tersebut akan dihapus saat user logout.
+
+**2. Role dan Authorization**
+
+Pada fitur Education, guest hanya bisa melihat data dan akan diarahkan ke Login kalau mencoba melakukan aksi yang membutuhkan akun.
+
+Regular user bisa memberi atau membatalkan star, tetapi tidak bisa create, edit, atau delete data Education.
+
+Editor dapat mengedit Education, sedangkan superuser memiliki akses penuh untuk create, edit, delete, dan star.
+
+Pembatasan akses diterapkan di template dan juga di view menggunakan `@login_required` serta `PermissionDenied`. Jadi, user tidak bisa melewati aturan hanya dengan membuka URL secara langsung.
+
+**3. Fitur Star**
+
+Saya menambahkan fitur star pada Education menggunakan relasi `ManyToManyField` dengan model `User`.
+
+User yang sudah login bisa memberi star atau membatalkan star pada Education. Jumlah total star juga ditampilkan pada setiap Education. Aksi ini menggunakan method `POST` dan `{% csrf_token %}` supaya tetap aman.
+
+**4. Endpoint JSON**
+
+Endpoint JSON Education dari Tugas 3 tetap dipertahankan di:
+
+```text
+/api/education/
 ```
 
-Buka http://127.0.0.1:8000/ dan coba alur berikut:
+Endpoint ini hanya menampilkan data Education dan tidak menampilkan data sensitif user.
 
-1. Tanpa login, halaman profil, Experience, Education, Projects, dan API tetap bisa dibaca. Navbar menampilkan Login/Register. Tombol tambah/hapus proyek tidak tampil; tombol Star mengarahkan ke login.
-2. Daftar di `/register/`. Konfirmasi password berbeda atau username duplikat menampilkan error. Registrasi valid mengarah ke `/login/`, tanpa memberikan hak superuser.
-3. Login dengan akun biasa. Username muncul di navbar; profil tetap milik Adyra. `Sesi Terakhir Login` menampilkan waktu Jakarta. DevTools → Application/Storage → Cookies memuat `sessionid` dan `last_login`. Cookie `last_login` hanya untuk tampilan, bukan penentu hak akses.
-4. Di `/projects/`, klik Star dan Unstar. Jumlah star berubah; arahkan kursor ke tombol untuk melihat username pemberi star. Coba akun kedua untuk memastikan star tersimpan per akun. `/api/projects/` memuat username dalam `starred_by`, bukan ID pengguna.
-5. Akun biasa mendapat 403 saat membuka `/projects/add/` atau mengirim permintaan hapus langsung. Akun superuser dapat menambah dan menghapus proyek. Request GET ke URL hapus/star tidak mengubah data; form POST memakai token CSRF.
-6. Logout menghapus session dan cookie `last_login`, lalu navbar kembali menampilkan Login/Register. Login selalu kembali ke profil, mengikuti tutorial.
+**5. Konfigurasi Editor**
 
-Migration `0006_project_starred_by` menambahkan tabel relasi star tanpa menghapus proyek lama. Pembatasan Education untuk Individual Assignment 4 tidak termasuk implementasi Tutorial 4 ini. Test lama Education diselaraskan dengan label model yang sudah ada, `Formal Education`.
+Role Editor dibuat melalui Django Admin. Setelah membuat superuser dengan `python manage.py createsuperuser`, saya membuat Group bernama `Editor` di halaman `/admin/`, lalu menambahkan user yang dipilih ke group tersebut.
+
+---
+
+### Screenshot Prompting Penggunaan AI
+
+Saya menggunakan ChatGPT untuk membantu memahami requirement, mengecek logic, dan debugging beberapa bagian Tugas 4.
+
+#### 1. Menyembunyikan tombol berdasarkan role
+
+**Prompt:**
+
+> Bagaimana cara menampilkan atau menyembunyikan tombol Create, Edit, dan Delete pada halaman Education berdasarkan role pengguna, tanpa mengubah fungsi tombol star?
+
+**Hasil dari AI:**
+
+Screenshot chat dapat diakses [di sini](static/img/nomer%201.png)
+
+AI menjelaskan bahwa tombol Create, Edit, dan Delete sebaiknya diatur di `education.html`, bukan di `education_star.html`. Saya lalu menambahkan kondisi template berdasarkan role user.
+
+#### 2. Menggunakan helper `is_editor(user)`
+
+**Prompt:**
+
+> Bagaimana cara memeriksa apakah pengguna termasuk Group Editor di Django, lalu menggunakan hasil pengecekan tersebut untuk membatasi akses edit Education?
+
+**Hasil dari AI:**
+
+Screenshot chat dapat diakses [di sini](static/img/no%202.png).
+
+AI menyarankan membuat helper is_editor(user) yang memeriksa apakah user sudah login dan tergabung dalam Group Editor. Helper tersebut dapat digunakan pada view untuk authorization dan dikirim ke template melalui context agar tombol Edit hanya muncul untuk Editor atau superuser.
+
+#### 3. Menentukan urutan pengecekan authorization
+
+**Prompt:**
+
+> Bagaimana urutan pengecekan yang tepat pada view update_education() agar pengunjung diarahkan ke login, pengguna reguler mendapat HTTP 403, dan editor atau superuser tetap mendapat HTTP 404 apabila UUID Education tidak ditemukan?
+
+**Hasil dari AI:**
+
+Screenshot chat dapat diakses [di sini](static/img/No%203.png).
+
+AI menjelaskan bahwa urutannya adalah pengecekan login, lalu pengecekan role, kemudian pencarian objek Education. Dengan urutan ini, guest akan diarahkan ke login, regular user mendapat 403 Forbidden, dan Editor atau superuser mendapat 404 apabila UUID Education memang tidak ditemukan.
+
+#### Keterbatasan AI dan Pemeriksaan Manual
+
+AI digunakan sebagai alat bantu, bukan pengganti pengujian. Saya tetap mengecek perubahan kode, menjalankan migration dan `python manage.py check`, lalu mencoba akses sebagai guest, regular user, Editor, dan superuser melalui browser.
+
