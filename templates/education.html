@@ -13,58 +13,229 @@
           <p class="section-kicker" style="margin: 0 0 6px 0;">ACADEMIC & LEARNING MATRIX</p>
           <h1 class="section-big-title" style="font-size: 2.35rem; font-weight: 800; margin: 0;">Education & Certs<span>.</span></h1>
         </div>
+        <button type="button" class="button button-secondary" onclick="showToast('Notifikasi Sistem', 'Education berhasil dimuat.', 'normal')">
+          Test Toast Notifikasi
+        </button>
         {% if user.is_superuser %}
-        <a href="{% url 'main:create_education' %}" class="button" style="background: #141413; color: #ffffff !important; text-decoration: none; padding: 0.6rem 1.4rem; border-radius: 9999px; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
-          <span>+</span> Tambah Pendidikan
-        </a>
+        <button type="button" class="button" popovertarget="add-education-modal">
+          <span aria-hidden="true">+</span> Tambah Education
+        </button>
         {% endif %}
       </div>
 
       {% for message in messages %}
         <p class="form-message" role="status">{{ message }}</p>
       {% endfor %}
-      <div class="edu-bento-grid">
-        {% for edu in education_list %}
-        <article class="bento-card-edu {% if 'Universitas Indonesia' in edu.institution %}featured{% endif %}">
-          <div>
-            {% if edu.image_url %}
-              <img src="{{ edu.image_url }}" 
-                   alt="Logo {{ edu.institution }}" 
-                   onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80'"
-                   style="width: 100%; height: 160px; object-fit: cover; border-radius: 14px; margin-bottom: 1rem; border: 1px solid #f0ece1; display: block;">
-            {% endif %}
-            <span class="pill-badge">{{ edu.get_category_display }}</span>
-            <h2 class="edu-title">{{ edu.title }}</h2>
-            <p class="edu-inst">{{ edu.institution }}</p>
-            {% if edu.description %}
-            <p class="edu-desc">{{ edu.description }}</p>
-            {% endif %}
-          </div>
-          <div>
-            <div class="edu-footer">
-              <span>Timeline: {{ edu.year }}</span>
-              <div class="education-actions">
-                {% include "components/education_star.html" with education=edu %}
-                {% if can_edit_education %}
-                <a href="{% url 'main:edit_education' edu.id %}" style="font-size: 0.78rem; font-weight: 700; color: #141413; background: #ece8df; padding: 4px 10px; border-radius: 999px; text-decoration: none;">Edit</a>
-                {% endif %}
-                {% if user.is_superuser %}
-                <form method="post" action="{% url 'main:delete_education' edu.id %}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus {{ edu.title|escapejs }}?');">
-                  {% csrf_token %}
-                  <button type="submit" style="font-size: 0.78rem; font-weight: 700; color: #ffffff; background: #b42318; padding: 4px 10px; border-radius: 999px; border: none; cursor: pointer;">Hapus</button>
-                </form>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </article>
-        {% empty %}
-        <div style="grid-column: 1 / -1; padding: 3.5rem 1.5rem; text-align: center; background: #ffffff; border: 1px dashed #d1ccc0; border-radius: 24px;">
-          <p style="color: #8d8981; font-size: 0.95rem; margin: 0;">Belum ada data pendidikan yang ditambahkan.</p>
-        </div>
-        {% endfor %}
-      </div>
+      <form id="education-search-form" class="project-search">
+        <input type="search" id="search-input" name="title" value="{{ title_query }}"
+               placeholder="Cari berdasarkan judul Education" class="project-search__input"
+               aria-label="Cari berdasarkan judul Education">
+        <button type="submit" class="button">Cari</button>
+      </form>
+      <div id="loading" class="empty-state hide"><p>Memuat Education...</p></div>
+      <div id="error" class="empty-state hide"><p>Gagal memuat data Education. Silakan coba lagi.</p></div>
+      <div id="empty" class="empty-state hide"><p>Belum ada data pendidikan yang ditambahkan atau ditemukan.</p></div>
+      <div id="grid" class="edu-bento-grid hide"></div>
     </div>
   </section>
 </main>
+{% if user.is_superuser %}
+{% include "components/education_form_modal.html" %}
+{% endif %}
+<script>
+const BASE_EDUCATION_ENDPOINT = "{% url 'main:get_education_json' %}";
+const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+const CAN_EDIT_EDUCATION = "{{ can_edit_education|yesno:'true,false' }}" === "true";
+let educationsAbortController;
+
+const loadingState = document.getElementById('loading');
+const errorState = document.getElementById('error');
+const emptyState = document.getElementById('empty');
+const gridContainer = document.getElementById('grid');
+const searchForm = document.getElementById('education-search-form');
+const searchInput = document.getElementById('search-input');
+const SEARCH_DEBOUNCE_DELAY = 300;
+let searchDebounceTimer;
+
+function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
+  loadingState.classList.toggle('hide', !showLoading);
+  errorState.classList.toggle('hide', !showError);
+  emptyState.classList.toggle('hide', !showEmpty);
+  gridContainer.classList.toggle('hide', !showGrid);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function buildEducationCardElement(item) {
+  const education = item.fields;
+  const educationId = item.pk;
+  const articleElement = document.createElement('article');
+  articleElement.className = 'bento-card-edu' + (education.institution.includes('Universitas Indonesia') ? ' featured' : '');
+  const imageHtml = education.image_url
+    ? `<img src="${escapeHtml(education.image_url)}" alt="Logo ${escapeHtml(education.institution)}"
+            onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80'"
+            style="width: 100%; height: 160px; object-fit: cover; border-radius: 14px; margin-bottom: 1rem; border: 1px solid #f0ece1; display: block;">`
+    : '';
+  const descriptionHtml = education.description ? `<p class="edu-desc">${escapeHtml(education.description)}</p>` : '';
+  const editUrl = "{% url 'main:edit_education' '00000000-0000-0000-0000-000000000000' %}"
+    .replace('00000000-0000-0000-0000-000000000000', educationId);
+  const deleteUrl = "{% url 'main:delete_education' '00000000-0000-0000-0000-000000000000' %}"
+    .replace('00000000-0000-0000-0000-000000000000', educationId);
+  const starUrl = "{% url 'main:toggle_education_star' '00000000-0000-0000-0000-000000000000' %}"
+    .replace('00000000-0000-0000-0000-000000000000', educationId);
+  const editHtml = CAN_EDIT_EDUCATION
+    ? `<a href="${editUrl}" style="font-size: 0.78rem; font-weight: 700; color: #141413; background: #ece8df; padding: 4px 10px; border-radius: 999px; text-decoration: none;">Edit</a>`
+    : '';
+  const deleteHtml = IS_SUPERUSER
+    ? `<form method="post" action="${deleteUrl}" class="education-delete-form" style="display: inline;">
+         {% csrf_token %}
+         <button type="submit" style="font-size: 0.78rem; font-weight: 700; color: #ffffff; background: #b42318; padding: 4px 10px; border-radius: 999px; border: none; cursor: pointer;">Hapus</button>
+       </form>`
+    : '';
+  const isStarredClass = education.is_starred ? ' is-starred' : '';
+  const starText = education.is_starred ? 'Unstar' : 'Star';
+  const starTitle = education.star_count > 0
+    ? `Dibintangi oleh ${escapeHtml(education.starred_by_names)}` : 'Belum ada yang memberi star';
+
+  articleElement.innerHTML = `
+    <div>
+      ${imageHtml}
+      <span class="pill-badge">${escapeHtml(education.category_display)}</span>
+      <h2 class="edu-title">${escapeHtml(education.title)}</h2>
+      <p class="edu-inst">${escapeHtml(education.institution)}</p>
+      ${descriptionHtml}
+    </div>
+    <div>
+      <div class="edu-footer">
+        <span>Timeline: ${escapeHtml(education.year)}</span>
+        <div class="education-actions">
+          <form method="post" action="${starUrl}" class="star-form">
+            {% csrf_token %}
+            <button type="submit" class="button button-star${isStarredClass}"
+                    aria-pressed="${escapeHtml(education.is_starred)}" title="${starTitle}">
+              <span aria-hidden="true">★</span> ${starText}
+              <span class="star-count">${escapeHtml(education.star_count)}</span>
+            </button>
+          </form>
+          ${editHtml}
+          ${deleteHtml}
+        </div>
+      </div>
+    </div>`;
+  const deleteForm = articleElement.querySelector('.education-delete-form');
+  if (deleteForm) {
+    deleteForm.addEventListener('submit', function(e) {
+      if (!confirm(`Yakin ingin menghapus ${education.title}?`)) e.preventDefault();
+    });
+  }
+  return articleElement;
+}
+
+async function fetchEducations(searchQuery = '') {
+  if (educationsAbortController) educationsAbortController.abort();
+  educationsAbortController = new AbortController();
+  try {
+    displayPageSection({ showLoading: true });
+    const url = searchQuery ? `${BASE_EDUCATION_ENDPOINT}?title=${encodeURIComponent(searchQuery)}` : BASE_EDUCATION_ENDPOINT;
+    const response = await fetch(url, {
+      headers: { 'Accept': 'application/json' },
+      signal: educationsAbortController.signal,
+    });
+    if (!response.ok) throw new Error('Failed to fetch data');
+    const educationData = await response.json();
+    gridContainer.innerHTML = '';
+    if (educationData.length === 0) {
+      displayPageSection({ showEmpty: true });
+    } else {
+      educationData.forEach(item => gridContainer.appendChild(buildEducationCardElement(item)));
+      displayPageSection({ showGrid: true });
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') return;
+    console.error('Error loading educations:', error);
+    displayPageSection({ showError: true });
+  }
+}
+
+function searchEducations() {
+  fetchEducations(searchInput.value.trim());
+}
+
+searchInput.addEventListener('input', function() {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(function() {
+    searchEducations();
+  }, SEARCH_DEBOUNCE_DELAY);
+});
+
+searchForm.addEventListener('submit', function(event) {
+  event.preventDefault();
+  clearTimeout(searchDebounceTimer);
+  searchEducations();
+});
+function closeEducationModal() {
+  document.getElementById('add-education-modal').hidePopover();
+}
+
+const CREATE_EDUCATION_ENDPOINT = "{% url 'main:create_education_ajax' %}";
+const educationForm = document.getElementById('education-form');
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+async function addEducation(event) {
+  event.preventDefault();
+  const submitButton = educationForm.querySelector('button[type="submit"]');
+  if (submitButton.disabled) return;
+  submitButton.disabled = true;
+  try {
+    const response = await fetch(CREATE_EDUCATION_ENDPOINT, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCookie('csrftoken') },
+      body: new FormData(educationForm),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.ok) {
+      educationForm.reset();
+      closeEducationModal();
+      showToast('Berhasil', 'Education baru berhasil ditambahkan!', 'success');
+      fetchEducations(searchInput.value.trim());
+    } else {
+      const errorMessages = result.errors
+        ? Object.values(result.errors).flat().map(error => error.message)
+        : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+      showToast('Gagal menambahkan Education', errorMessages.join(' '), 'error');
+    }
+  } catch (error) {
+    console.error('Error adding education:', error);
+    showToast('Gagal menambahkan Education', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+  } finally {
+    submitButton.disabled = false;
+  }
+}
+
+if (educationForm) {
+  educationForm.addEventListener('submit', addEducation);
+}
+fetchEducations(searchInput.value.trim());
+</script>
 {% endblock content %}

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from main.models import Experience, Education, Project
@@ -100,6 +100,17 @@ def create_education(request):
     }
     return render(request, "education_form.html", context)
 
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse({"message": "Hanya superuser yang dapat menambahkan Education."}, status=403)
+    form = EducationForm(request.POST)
+    if form.is_valid():
+        education = form.save()
+        return JsonResponse({"message": "Education berhasil ditambahkan.", "pk": str(education.pk)}, status=201)
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+
 @login_required(login_url="/login/")
 def edit_education(request, education_id):
     if not can_edit_education(request.user):
@@ -119,19 +130,37 @@ def edit_education(request, education_id):
     return render(request, "education_form.html", context)
 
 def get_education_json(request):
+    title_query = request.GET.get("title", "").strip()
     education_data = Education.objects.prefetch_related("starred_by")
-    education_json = serializers.serialize(
-        "json", education_data, use_natural_foreign_keys=True,
-        fields=("title", "institution", "year", "category", "description", "image_url", "starred_by"),
-    )
-    return HttpResponse(education_json, content_type="application/json")
+    if title_query:
+        education_data = education_data.filter(title__icontains=title_query)
+
+    data = []
+    for education in education_data:
+        starred_users = education.starred_by.all()
+        data.append({
+            "pk": str(education.pk),
+            "fields": {
+                "title": education.title,
+                "institution": education.institution,
+                "year": education.year,
+                "category": education.category,
+                "category_display": education.get_category_display(),
+                "description": education.description,
+                "image_url": education.image_url,
+                "star_count": len(starred_users),
+                "is_starred": request.user in starred_users if request.user.is_authenticated else False,
+                "starred_by_names": ", ".join(user.username for user in starred_users),
+            },
+        })
+    return JsonResponse(data, safe=False)
 
 def show_education(request):
-    education_list = Education.objects.prefetch_related("starred_by")
     context = {
         "name": "Adyra Rachellyn Arkossand",
-        "education_list": education_list,
+        "title_query": request.GET.get("title", "").strip(),
         "can_edit_education": can_edit_education(request.user),
+        "form": EducationForm(),
     }
     return render(request, "education.html", context)
 

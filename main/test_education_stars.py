@@ -52,8 +52,10 @@ class EducationStarTest(TestCase):
         response = self.client.get(reverse("main:get_education_json"))
         self.assertEqual(response.status_code, 200)
         fields = response.json()[0]["fields"]
-        self.assertEqual(set(fields), {"title", "institution", "year", "category", "description", "image_url", "starred_by"})
-        self.assertEqual(fields["starred_by"], [["member"]])
+        self.assertEqual(set(fields), {"title", "institution", "year", "category", "category_display", "description", "image_url", "star_count", "is_starred", "starred_by_names"})
+        self.assertEqual(fields["starred_by_names"], "member")
+        self.assertEqual(fields["star_count"], 1)
+        self.assertFalse(fields["is_starred"])
         self.assertNotContains(response, "private@example.com")
         self.assertNotContains(response, "password")
 
@@ -73,22 +75,32 @@ class EducationStarTest(TestCase):
 
     def test_star_status_count_and_username_tooltip(self):
         self.client.force_login(self.member)
-        response = self.client.get(reverse("main:show_education"))
-        self.assertContains(response, 'aria-pressed="false"')
-        self.assertContains(response, 'class="star-count">0</span>')
+        url = reverse("main:get_education_json")
+        fields = self.client.get(url).json()[0]["fields"]
+        self.assertFalse(fields["is_starred"])
+        self.assertEqual(fields["star_count"], 0)
         self.client.post(self.url())
-        response = self.client.get(reverse("main:show_education"))
-        self.assertContains(response, "Unstar")
-        self.assertContains(response, 'aria-pressed="true"')
-        self.assertContains(response, 'class="star-count">1</span>')
-        self.assertContains(response, "Dibintangi oleh member")
+        fields = self.client.get(url).json()[0]["fields"]
+        self.assertTrue(fields["is_starred"])
+        self.assertEqual(fields["star_count"], 1)
+        self.assertEqual(fields["starred_by_names"], "member")
         self.client.logout()
-        response = self.client.get(reverse("main:show_education"))
-        self.assertContains(response, 'aria-pressed="false"')
-        self.assertContains(response, 'class="star-count">1</span>')
+        fields = self.client.get(url).json()[0]["fields"]
+        self.assertFalse(fields["is_starred"])
+        self.assertEqual(fields["star_count"], 1)
+
+    def test_title_search_and_empty_results(self):
+        url = reverse("main:get_education_json")
+        for query in ["  dEgReE  ", "  "]:
+            data = self.client.get(url, {"title": query}).json()
+            self.assertEqual([item["pk"] for item in data], [str(self.education.pk)])
+        self.assertEqual(self.client.get(url, {"title": "not-found"}).json(), [])
+        response = self.client.get(reverse("main:show_education"), {"title": "  Degree  "})
+        self.assertEqual(response.context["title_query"], "Degree")
+        self.assertNotIn("education_list", response.context)
 
     def test_education_list_prefetches_stargazers(self):
-        from main.views import show_education
+        from main.views import get_education_json
         from django.test import RequestFactory
         from django.contrib.auth.models import AnonymousUser
         Education.objects.bulk_create([
@@ -97,5 +109,5 @@ class EducationStarTest(TestCase):
         request = RequestFactory().get("/education/")
         request.user = AnonymousUser()
         with self.assertNumQueries(2):
-            response = show_education(request)
+            response = get_education_json(request)
         self.assertEqual(response.status_code, 200)

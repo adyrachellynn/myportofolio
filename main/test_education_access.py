@@ -57,8 +57,8 @@ class EducationAccessTest(TestCase):
         self.assertFalse(Education.objects.filter(pk=self.education.pk).exists())
 
     def test_public_education_and_json_remain_readable(self):
-        for name in ["show_education", "get_education_json"]:
-            self.assertContains(self.client.get(reverse("main:" + name)), "Information Systems")
+        self.assertContains(self.client.get(reverse("main:show_education")), 'id="education-search-form"')
+        self.assertContains(self.client.get(reverse("main:get_education_json")), "Information Systems")
 
     def test_editor_can_only_update(self):
         from django.contrib.auth.models import Group
@@ -109,9 +109,11 @@ class EducationAccessTest(TestCase):
                 if user:
                     self.client.force_login(user)
                 response = self.client.get(reverse("main:show_education"))
-                for url, allowed in [(create, user == self.owner), (edit, user in [editor, self.owner]), (delete, user == self.owner)]:
-                    if allowed:
-                        self.assertContains(response, url)
-                    else:
-                        self.assertNotContains(response, url)
-                self.assertContains(response, reverse("main:toggle_education_star", args=[self.education.pk]))
+                if user == self.owner:
+                    self.assertContains(response, create)
+                else:
+                    self.assertNotContains(response, create)
+                superuser_flag = "true" if user == self.owner else "false"
+                edit_flag = "true" if user in [editor, self.owner] else "false"
+                self.assertContains(response, f'const IS_SUPERUSER = "{superuser_flag}"')
+                self.assertContains(response, f'const CAN_EDIT_EDUCATION = "{edit_flag}"')

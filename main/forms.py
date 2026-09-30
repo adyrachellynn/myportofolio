@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
 from django.forms import ModelForm, TextInput, Textarea, URLInput, Select
 from main.models import Project, Education
 
@@ -105,3 +107,18 @@ class EducationForm(ModelForm):
                 attrs={"placeholder": "https://... (URL gambar logo atau foto kampus)"}
             ),
         }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama Education tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_institution(self):
+        return strip_tags(self.cleaned_data["institution"]).strip()
+
+    def clean_year(self):
+        return strip_tags(self.cleaned_data["year"]).strip()
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data.get("description") or "").strip()

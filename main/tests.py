@@ -76,14 +76,16 @@ class EducationTest(TestCase):
 
     def test_education_page_with_data(self):
         response = self.client.get(reverse("main:show_education"))
-        self.assertContains(response, self.edu.title)
-        self.assertContains(response, self.edu.institution)
-        self.assertContains(response, "Formal Education")
+        self.assertNotIn("education_list", response.context)
+        fields = self.client.get(reverse("main:get_education_json")).json()[0]["fields"]
+        self.assertEqual(fields["title"], self.edu.title)
+        self.assertEqual(fields["institution"], self.edu.institution)
+        self.assertEqual(fields["category_display"], "Formal Education")
 
     def test_empty_education_page(self):
         Education.objects.all().delete()
         response = self.client.get(reverse("main:show_education"))
-        self.assertContains(response, "Belum ada data pendidikan yang ditambahkan.")
+        self.assertContains(response, "Belum ada data pendidikan yang ditambahkan atau ditemukan.")
 
 
 class AuthenticationTest(TestCase):
