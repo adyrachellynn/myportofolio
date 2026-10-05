@@ -364,3 +364,34 @@ AI menjelaskan bahwa urutannya adalah pengecekan login, lalu pengecekan role, ke
 
 AI digunakan sebagai alat bantu, bukan pengganti pengujian. Saya tetap mengecek perubahan kode, menjalankan migration dan `python manage.py check`, lalu mencoba akses sebagai guest, regular user, Editor, dan superuser melalui browser.
 
+### TUGAS 5
+
+#### Pertanyaan Reflektif
+
+**1. Jelaskan apa itu debouncing dan mengapa teknik ini penting diterapkan pada fitur pencarian yang menggunakan AJAX!**
+
+Debouncing adalah cara untuk menunda pencarian sampai user berhenti mengetik selama beberapa saat. Di fitur search Education, saya memakai jeda 300 ms. Jadi, search tidak langsung jalan setiap satu huruf diketik.
+
+Menurut saya pribasi, debouncing penting karena kalau setiap ketikan langsung mengirim request AJAX, request ke server jadi terlalu banyak. Dengan debouncing, pencarian tetap jadi lebih cepat, tetapi lebih efisien krn request baru dikirim setelah user selesai mengetik sebentar ><
+
+**2. Jelaskan fungsi dari penggunaan `await` ketika kita menggunakan `fetch()`! Apa yang akan terjadi jika kita tidak menggunakan `await`?**
+
+`await` digunakan untuk menunggu proses `fetch()` selesai sebelum JavaScript lanjut menjalankan baris berikutnya. Di halaman Education, `await` dipakai supaya data dari endpoint JSON benar-benar sudah diterima sebelum digunakan untuk membuat kartu Education.
+
+Kalau tidak memakai `await`, kode bisa lanjut duluan saat data dari server belum siap. Akibatnya, JavaScript bisa mencoba menampilkan data yang belum ada atau masih berbentuk Promise, sehingga hasilnya dapat error atau tidak tampil dengan benar.
+
+**3. Jelaskan apa itu serangan XSS (Cross-Site Scripting) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui template Django!**
+
+XSS adalah serangan ketika seseorang memasukkan kode JavaScript berbahaya ke dalam data yang nantinya ditampilkan di website. Misalnya, user memasukkan tag gambar dengan event JavaScript ke judul Education.
+
+Saat data ditampilkan langsung memakai template Django, Django biasanya otomatis mengubah karakter seperti `<` dan `>` menjadi teks biasa. Namun, pada AJAX, data JSON dirakit lagi menggunakan JavaScript dan `innerHTML`, jadi perlindungan otomatis dari template Django tidak berlaku di bagian tersebut.
+
+Karena itu, saya memakai `escapeHtml()` sebelum data Education dimasukkan ke HTML. Saya juga memakai `strip_tags()` di `EducationForm` untuk membersihkan input teks sebagai perlindungan tambahan.
+
+#### Dokumentasi Penggunaan AI
+
+Pada Tugas 5, saya menggunakan ChatGPT untuk membantu memahami requirement dan mengecek alur implementasi fitur JavaScript pada Education.
+
+ChatGPT membantu saya menyusun urutan pengerjaan supaya fitur dari Tutorial 5 tidak ada yang terlewat, seperti AJAX, search dengan debounce, modal tambah data, toast, dan XSS protection.
+
+Setelah itu, saya tetap mencoba fitur di browser, menjalankan `python manage.py check`, dan memastikan akses Guest, regular user, Editor, serta superuser tidak berubah dari aturan Tugas 4. Saya juga tetap mengecek hasil kodenya karena saran AI harus disesuaikan lagi dengan struktur project saya.
