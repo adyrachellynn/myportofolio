@@ -26,10 +26,17 @@
       {% for message in messages %}
         <p class="form-message" role="status">{{ message }}</p>
       {% endfor %}
-      <form id="education-search-form" class="project-search">
+      <form id="education-search-form" class="project-search education-search">
         <input type="search" id="search-input" name="title" value="{{ title_query }}"
                placeholder="Cari berdasarkan judul Education" class="project-search__input"
                aria-label="Cari berdasarkan judul Education">
+        <select id="category-filter" name="category" class="project-search__input education-search__category"
+                aria-label="Filter kategori Education">
+          <option value="">Semua Kategori</option>
+          <option value="formal">Formal Education</option>
+          <option value="cert">Certificate</option>
+          <option value="course">Course</option>
+        </select>
         <button type="submit" class="button">Cari</button>
         <button type="button" id="clear-education-search" class="button button-secondary{% if not title_query %} hide{% endif %}"
                 aria-label="Hapus pencarian Education" aria-controls="search-input">Hapus Pencarian</button>
@@ -56,6 +63,7 @@ const emptyState = document.getElementById('empty');
 const gridContainer = document.getElementById('grid');
 const searchForm = document.getElementById('education-search-form');
 const searchInput = document.getElementById('search-input');
+const categoryFilter = document.getElementById('category-filter');
 const clearSearchButton = document.getElementById('clear-education-search');
 const SEARCH_DEBOUNCE_DELAY = 300;
 let searchDebounceTimer;
@@ -141,12 +149,16 @@ function buildEducationCardElement(item) {
   return articleElement;
 }
 
-async function fetchEducations(searchQuery = '') {
+async function fetchEducations(searchQuery = '', category = categoryFilter.value) {
   if (educationsAbortController) educationsAbortController.abort();
   educationsAbortController = new AbortController();
   try {
     displayPageSection({ showLoading: true });
-    const url = searchQuery ? `${BASE_EDUCATION_ENDPOINT}?title=${encodeURIComponent(searchQuery)}` : BASE_EDUCATION_ENDPOINT;
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('title', searchQuery);
+    if (category) params.set('category', category);
+    const queryString = params.toString();
+    const url = queryString ? `${BASE_EDUCATION_ENDPOINT}?${queryString}` : BASE_EDUCATION_ENDPOINT;
     const response = await fetch(url, {
       headers: { 'Accept': 'application/json' },
       signal: educationsAbortController.signal,
@@ -176,6 +188,11 @@ function updateClearSearchVisibility() {
 }
 
 updateClearSearchVisibility();
+
+categoryFilter.addEventListener('change', function() {
+  clearTimeout(searchDebounceTimer);
+  searchEducations();
+});
 
 clearSearchButton.addEventListener('click', function() {
   searchInput.value = '';

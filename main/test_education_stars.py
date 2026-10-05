@@ -99,6 +99,29 @@ class EducationStarTest(TestCase):
         self.assertEqual(response.context["title_query"], "Degree")
         self.assertNotIn("education_list", response.context)
 
+    def test_category_filter_and_unfiltered_results(self):
+        url = reverse("main:get_education_json")
+        certificate = Education.objects.create(title="Degree Certificate", institution="UI", year="2026", category="cert")
+        course = Education.objects.create(title="Python Course", institution="UI", year="2026", category="course")
+        for category, education in [("formal", self.education), ("cert", certificate), ("course", course)]:
+            with self.subTest(category=category):
+                data = self.client.get(url, {"category": category}).json()
+                self.assertEqual([item["pk"] for item in data], [str(education.pk)])
+        for category in ["", "   ", "invalid"]:
+            with self.subTest(category=category):
+                data = self.client.get(url, {"category": category}).json()
+                self.assertCountEqual([item["pk"] for item in data], [str(self.education.pk), str(certificate.pk), str(course.pk)])
+
+    def test_title_and_category_filters_are_combined(self):
+        url = reverse("main:get_education_json")
+        certificate = Education.objects.create(title="Degree Certificate", institution="UI", year="2026", category="cert")
+        Education.objects.create(title="Other Certificate", institution="UI", year="2026", category="cert")
+        data = self.client.get(url, {"title": "  dEgReE  ", "category": " cert "}).json()
+        self.assertEqual([item["pk"] for item in data], [str(certificate.pk)])
+        self.assertEqual(self.client.get(url, {"title": "Degree", "category": "course"}).json(), [])
+        data = self.client.get(url, {"title": "Degree", "category": "invalid"}).json()
+        self.assertCountEqual([item["pk"] for item in data], [str(self.education.pk), str(certificate.pk)])
+
     def test_education_list_prefetches_stargazers(self):
         from main.views import get_education_json
         from django.test import RequestFactory

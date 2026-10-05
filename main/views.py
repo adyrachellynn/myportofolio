@@ -131,9 +131,12 @@ def edit_education(request, education_id):
 
 def get_education_json(request):
     title_query = request.GET.get("title", "").strip()
+    category_query = request.GET.get("category", "").strip()
     education_data = Education.objects.prefetch_related("starred_by")
     if title_query:
         education_data = education_data.filter(title__icontains=title_query)
+    if category_query in dict(Education.CATEGORY_CHOICES):
+        education_data = education_data.filter(category=category_query)
 
     data = []
     for education in education_data:
