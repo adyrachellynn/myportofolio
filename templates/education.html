@@ -31,6 +31,8 @@
                placeholder="Cari berdasarkan judul Education" class="project-search__input"
                aria-label="Cari berdasarkan judul Education">
         <button type="submit" class="button">Cari</button>
+        <button type="button" id="clear-education-search" class="button button-secondary{% if not title_query %} hide{% endif %}"
+                aria-label="Hapus pencarian Education" aria-controls="search-input">Hapus Pencarian</button>
       </form>
       <div id="loading" class="empty-state hide"><p>Memuat Education...</p></div>
       <div id="error" class="empty-state hide"><p>Gagal memuat data Education. Silakan coba lagi.</p></div>
@@ -54,6 +56,7 @@ const emptyState = document.getElementById('empty');
 const gridContainer = document.getElementById('grid');
 const searchForm = document.getElementById('education-search-form');
 const searchInput = document.getElementById('search-input');
+const clearSearchButton = document.getElementById('clear-education-search');
 const SEARCH_DEBOUNCE_DELAY = 300;
 let searchDebounceTimer;
 
@@ -168,7 +171,22 @@ function searchEducations() {
   fetchEducations(searchInput.value.trim());
 }
 
+function updateClearSearchVisibility() {
+  clearSearchButton.classList.toggle('hide', searchInput.value === '');
+}
+
+updateClearSearchVisibility();
+
+clearSearchButton.addEventListener('click', function() {
+  searchInput.value = '';
+  clearTimeout(searchDebounceTimer);
+  updateClearSearchVisibility();
+  searchEducations();
+  searchInput.focus();
+});
+
 searchInput.addEventListener('input', function() {
+  updateClearSearchVisibility();
   clearTimeout(searchDebounceTimer);
   searchDebounceTimer = setTimeout(function() {
     searchEducations();
