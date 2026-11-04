@@ -41,3 +41,5 @@ function showToast(title, message, type = 'normal', duration = 3000) {
     toastTimer = setTimeout(() => toastComponent.hidePopover(), 300);
   }, duration);
 }
+
+window.showToast = showToast;
