@@ -1,0 +1,81 @@
+<div id="add-project-modal"
+     class="education-form-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="add-project-modal-title">
+
+  <button type="button"
+          class="education-form-modal__backdrop"
+          popovertarget="add-project-modal"
+          popovertargetaction="hide"
+          aria-label="Tutup form tambah proyek"></button>
+
+  <div class="education-form-modal__content">
+    <button type="button"
+            class="education-form-modal__close"
+            popovertarget="add-project-modal"
+            popovertargetaction="hide"
+            aria-label="Tutup form tambah proyek">×</button>
+
+    <h2 id="add-project-modal-title">Tambah Proyek Baru</h2>
+
+    <form id="project-form" method="post" action="{% url 'main:create_project_ajax' %}">
+      {% csrf_token %}
+
+
+      <div class="form-group">
+        <label for="add-project-title">Nama Proyek</label>
+        <input type="text"
+               id="add-project-title"
+               name="title"
+               maxlength="255"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="add-project-description">Deskripsi Proyek</label>
+        <textarea id="add-project-description"
+                  name="description"
+                  rows="3"
+                  required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="add-project-tech-stack">Teknologi yang Digunakan</label>
+        <input type="text"
+               id="add-project-tech-stack"
+               name="tech_stack"
+               maxlength="255"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label for="add-project-url">URL Proyek</label>
+        <input type="url"
+               id="add-project-url"
+               name="project_url">
+      </div>
+
+      <div class="form-group">
+        <label for="add-project-image-url">URL Gambar Proyek</label>
+        <input type="url"
+               id="add-project-image-url"
+               name="project_image_url">
+      </div>
+
+      <div class="education-form-modal__actions">
+        <button type="button"
+                class="button button-secondary"
+                popovertarget="add-project-modal"
+                popovertargetaction="hide">
+          Batal
+        </button>
+
+        <button type="submit" class="button">
+          Tambah Proyek
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

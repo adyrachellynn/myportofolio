@@ -11,6 +11,7 @@ from main.views import (
     toggle_education_star,
     show_projects, 
     create_project, 
+    create_project_ajax,
     get_projects_json, 
     delete_project,
     register, login_user, logout_user, toggle_star,
@@ -39,6 +40,7 @@ urlpatterns = [
     # Projects CRUD & API
     path("projects/", show_projects, name="show_projects"),
     path("projects/add/", create_project, name="create_project"),
+    path("projects/add-ajax/", create_project_ajax, name="create_project_ajax"),
     path("api/projects/", get_projects_json, name="get_projects_json"),
     path("projects/<uuid:project_id>/delete/", delete_project, name="delete_project"),
 ]
