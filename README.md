@@ -395,3 +395,23 @@ Pada Tugas 5, saya menggunakan ChatGPT untuk membantu memahami requirement dan m
 ChatGPT membantu saya menyusun urutan pengerjaan supaya fitur dari Tutorial 5 tidak ada yang terlewat, seperti AJAX, search dengan debounce, modal tambah data, toast, dan XSS protection.
 
 Setelah itu, saya tetap mencoba fitur di browser, menjalankan `python manage.py check`, dan memastikan akses Guest, regular user, Editor, serta superuser tidak berubah dari aturan Tugas 4. Saya juga tetap mengecek hasil kodenya karena saran AI harus disesuaikan lagi dengan struktur project saya.
+
+#### TUGAS  6
+
+1. REST adalah cara atau aturan umum untuk membuat API agar komunikasi antara frontend dan backend lebih rapi. Dalam REST, data dipandang sebagai resource yang punya URL sendiri, misalnya Project dapat diakses lewat `/api/v1/projects/`. Selain URL, penggunaan HTTP method juga harus sesuai, seperti GET untuk mengambil data, POST untuk menambah data, PATCH atau PUT untuk mengubah data, dan DELETE untuk menghapus data.
+
+   Mengembalikan JSON saja belum cukup untuk disebut RESTful karena JSON hanya bentuk data yang dikirim. Sebuah API juga perlu memiliki endpoint yang jelas, method yang sesuai dengan aksinya, dan status code yang sesuai dengan hasil request.
+
+   PUT digunakan ketika ingin mengganti data secara lengkap. Misalnya, jika seluruh informasi Project ingin diperbarui, maka title, description, tech_stack, dan field lainnya dikirim kembali. Sementara itu, PATCH digunakan ketika hanya ingin mengubah sebagian data. Contohnya, Editor hanya ingin mengubah judul Project tanpa perlu mengirim ulang deskripsi dan teknologi yang digunakan.
+
+2. Serializer di Django REST Framework berfungsi sebagai penghubung antara model Django dan data JSON. Serializer mengubah object dari database menjadi data yang bisa dikirim ke frontend. Selain itu, serializer juga menerima data dari request, mengecek apakah datanya valid, lalu menyimpannya jika tidak ada kesalahan.
+
+   Menurut saya, serializer lebih praktis dibanding membuat dictionary manual dengan JsonResponse. Field yang ingin ditampilkan bisa diatur dengan jelas, field tertentu bisa dibuat read-only, dan validasi input dapat dilakukan di satu tempat. Pada Project, serializer juga membantu menampilkan informasi seperti jumlah star dan status apakah user yang sedang login sudah memberi star atau belum.
+
+3. Autentikasi adalah proses untuk mengetahui siapa pengguna yang sedang memakai aplikasi. Contohnya, setelah login, sistem dapat mengetahui apakah pengguna tersebut adalah user biasa, Editor, atau superuser. Sementara itu, otorisasi adalah pengecekan mengenai tindakan apa yang boleh dilakukan oleh pengguna tersebut.
+
+   Pada project ini, user biasa dapat memberi star, Editor dapat mengubah Project, dan superuser dapat menambah maupun menghapus Project. Pemeriksaan hak akses harus tetap dilakukan di server menggunakan permission class. Alasannya, tombol yang disembunyikan di template hanya menyembunyikan tampilan. Jika hanya mengandalkan template, pengguna masih bisa mencoba mengakses endpoint API secara langsung. Dengan permission class, server tetap dapat menolak request yang tidak memiliki izin.
+
+4. Saat memakai SessionAuthentication, browser akan otomatis mengirim cookie session ketika pengguna sedang login. Karena itu, request yang mengubah data seperti POST, PATCH, atau DELETE tetap membutuhkan token CSRF. Token ini digunakan untuk memastikan request benar-benar berasal dari halaman website yang sedang digunakan, bukan dari website lain yang mencoba memakai session pengguna tanpa izin.
+
+   force_authenticate belum cukup untuk menguji CSRF karena cara tersebut langsung membuat request dianggap sudah terautentikasi. Proses login dan cookie session seperti pada penggunaan website asli tidak benar-benar dilewati. Karena itu, untuk menguji CSRF saya menggunakan APIClient(enforce_csrf_checks=True) lalu login dengan .login(). Dengan test tersebut, request POST tanpa token CSRF dapat dipastikan ditolak oleh server.
