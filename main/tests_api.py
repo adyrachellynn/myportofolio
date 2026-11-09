@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group, User
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import Education
+from main.models import Education, Project
 
 
 class EducationAPITest(APITestCase):
@@ -202,3 +202,237 @@ class EducationAPITest(APITestCase):
                                    HTTP_X_CSRFTOKEN=client.cookies['csrftoken'].value)
             self.assertEqual(response.status_code, 201 if user == self.owner else 403)
             self.assertEqual(Education.objects.count(), before + (1 if user == self.owner else 0))
+
+class ProjectAPITest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.regular = User.objects.create_user(
+            "project-regular",
+            password="Test-password-482!",
+        )
+        editor_group, _ = Group.objects.get_or_create(name="Editor")
+        cls.editor = User.objects.create_user(
+            "project-editor",
+            password="Test-password-482!",
+        )
+        cls.editor.groups.add(editor_group)
+
+        cls.owner = User.objects.create_superuser(
+            "project-owner",
+            "project-owner@example.com",
+            "Test-password-482!",
+        )
+        cls.project = Project.objects.create(
+            title="Portfolio Website",
+            description="Personal portfolio project",
+            tech_stack="Django, JavaScript",
+        )
+
+    def setUp(self):
+        self.list_url = reverse("api:project-list")
+        self.detail_url = reverse(
+            "api:project-detail",
+            args=[self.project.pk],
+        )
+        self.star_url = reverse(
+            "api:project-star",
+            args=[self.project.pk],
+        )
+        self.payload = {
+            "title": "New Project",
+            "description": "New project description",
+            "tech_stack": "Django",
+            "project_url": "",
+            "project_image_url": "",
+        }
+
+    def test_public_list_and_title_search(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["id"], str(self.project.pk))
+        self.assertEqual(response.data[0]["title"], self.project.title)
+        self.assertFalse(response.data[0]["is_starred"])
+        self.assertEqual(response.data[0]["star_count"], 0)
+        self.assertNotIn("password", response.data[0])
+
+        response = self.client.get(self.list_url, {"title": " PORTFOLIO "})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        response = self.client.get(self.list_url, {"title": "tidak ada"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+
+    def test_public_detail_and_missing_project(self):
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], str(self.project.pk))
+
+        missing_url = reverse("api:project-detail", args=[uuid.uuid4()])
+        self.assertEqual(self.client.get(missing_url).status_code, 404)
+
+    def test_guest_regular_and_editor_cannot_create(self):
+        for user in [None, self.regular, self.editor]:
+            with self.subTest(user=user):
+                self.client.force_authenticate(user=user)
+                before = Project.objects.count()
+
+                response = self.client.post(
+                    self.list_url,
+                    self.payload,
+                    format="json",
+                )
+
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(Project.objects.count(), before)
+
+    def test_superuser_can_create_project(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Project.objects.count(), 2)
+        self.assertEqual(response.data["title"], "New Project")
+
+    def test_invalid_project_does_not_save(self):
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.post(
+            self.list_url,
+            {**self.payload, "title": "<img src=x onerror=alert(1)>"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", response.data)
+        self.assertEqual(Project.objects.count(), 1)
+
+    def test_guest_and_regular_cannot_update(self):
+        for user in [None, self.regular]:
+            with self.subTest(user=user):
+                self.client.force_authenticate(user=user)
+
+                response = self.client.patch(
+                    self.detail_url,
+                    {"title": "Tidak Boleh Berubah"},
+                    format="json",
+                )
+
+                self.assertEqual(response.status_code, 403)
+                self.project.refresh_from_db()
+                self.assertEqual(self.project.title, "Portfolio Website")
+
+    def test_editor_and_superuser_can_update(self):
+        self.client.force_authenticate(user=self.editor)
+
+        response = self.client.patch(
+            self.detail_url,
+            {"title": "Diubah Editor"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Diubah Editor")
+        self.assertEqual(
+            self.project.description,
+            "Personal portfolio project",
+        )
+
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.put(
+            self.detail_url,
+            {
+                **self.payload,
+                "title": "Diubah Superuser",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Diubah Superuser")
+
+    def test_only_superuser_can_delete(self):
+        for user in [None, self.regular, self.editor]:
+            with self.subTest(user=user):
+                self.client.force_authenticate(user=user)
+
+                response = self.client.delete(self.detail_url)
+
+                self.assertEqual(response.status_code, 403)
+                self.assertTrue(
+                    Project.objects.filter(pk=self.project.pk).exists()
+                )
+
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.delete(self.detail_url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(
+            Project.objects.filter(pk=self.project.pk).exists()
+        )
+
+    def test_star_requires_login_and_uses_current_user(self):
+        response = self.client.post(self.star_url)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(self.project.starred_by.count(), 0)
+
+        self.client.force_authenticate(user=self.regular)
+
+        response = self.client.post(self.star_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 1)
+        self.assertEqual(
+            response.data["starred_by_names"],
+            self.regular.username,
+        )
+
+        response = self.client.post(self.star_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 0)
+
+    def test_session_post_requires_csrf(self):
+        client = APIClient(enforce_csrf_checks=True)
+
+        self.assertTrue(
+            client.login(
+                username=self.owner.username,
+                password="Test-password-482!",
+            )
+        )
+
+        response = client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Project.objects.count(), 1)
+
+        client.get(reverse("main:show_projects"))
+
+        response = client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+            HTTP_X_CSRFTOKEN=client.cookies["csrftoken"].value,
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Project.objects.count(), 2)

@@ -200,19 +200,19 @@ class ProjectAuthorizationTest(TestCase):
 
     def test_public_pages_and_controls(self):
         for user in [None, self.member, self.owner]:
-            with self.subTest(user=user):
-                if user:
-                    self.client.force_login(user)
-                response = self.client.get(reverse("main:show_projects"))
-                self.assertContains(response, "Portfolio")
-                self.assertContains(response, self.project_url("toggle_star"))
-                for url in [reverse("main:create_project"), self.project_url("delete_project")]:
-                    if user == self.owner:
-                        self.assertContains(response, url)
-                    else:
-                        self.assertNotContains(response, url)
-        self.client.logout()
-        self.assertEqual(self.client.get(reverse("main:get_projects_json")).status_code, 200)
+            self.client.logout()
+            if user:
+                self.client.force_login(user)
+            response = self.client.get(reverse("main:show_projects"))
+            self.assertNotIn("project_list", response.context)
+            self.assertContains(response, 'id="project-search-form"')
+            self.assertContains(response, f'const IS_SUPERUSER = "{"true" if user == self.owner else "false"}"')
+            if user == self.owner:
+                self.assertContains(response, 'id="project-form"')
+            else:
+                self.assertNotContains(response, 'id="project-form"')
+            fields = self.client.get(reverse("main:get_projects_json")).json()[0]["fields"]
+            self.assertEqual(fields["title"], "Portfolio")
 
     def test_anonymous_mutations_redirect_to_login(self):
         from main.models import Project
@@ -252,16 +252,14 @@ class ProjectAuthorizationTest(TestCase):
             self.assertRedirects(self.client.post(self.project_url("toggle_star")), reverse("main:show_projects"))
         self.assertEqual(self.project.starred_by.count(), 3)
         self.assertIn(self.project, self.member.starred_projects.all())
-        response = self.client.get(reverse("main:show_projects"))
-        self.assertContains(response, "Unstar")
-        self.assertContains(response, 'class="star-count">3</span>')
-        self.assertContains(response, "Dibintangi oleh")
         fields = self.client.get(reverse("main:get_projects_json")).json()[0]["fields"]
-        self.assertCountEqual(fields["starred_by"], [["member"], ["other"], ["owner"]])
+        self.assertTrue(fields["is_starred"])
+        self.assertEqual(fields["star_count"], 3)
+        self.assertCountEqual(fields["starred_by_names"].split(", "), ["member", "other", "owner"])
         self.client.post(self.project_url("toggle_star"))
         self.assertFalse(self.project.starred_by.filter(pk=self.owner.pk).exists())
         self.assertEqual(self.project.starred_by.count(), 2)
-        self.assertNotContains(self.client.get(reverse("main:show_projects")), "Unstar")
+        self.assertFalse(self.client.get(reverse("main:get_projects_json")).json()[0]["fields"]["is_starred"])
 
     def test_get_star_does_not_mutate_and_missing_project_is_404(self):
         import uuid
@@ -271,13 +269,12 @@ class ProjectAuthorizationTest(TestCase):
         self.assertEqual(self.client.post(reverse("main:toggle_star", args=[uuid.uuid4()])).status_code, 404)
 
     def test_project_search_still_filters_page_and_api(self):
-        for page in ["show_projects", "get_projects_json"]:
-            self.assertContains(self.client.get(reverse("main:" + page), {"title": "folio"}), "Portfolio")
-            response = self.client.get(reverse("main:" + page), {"title": "absent"})
-            if page == "get_projects_json":
-                self.assertEqual(response.json(), [])
-            else:
-                self.assertNotContains(response, self.project_url("toggle_star"))
+        url = reverse("main:get_projects_json")
+        self.assertEqual(self.client.get(url, {"title": "folio"}).json()[0]["fields"]["title"], "Portfolio")
+        self.assertEqual(self.client.get(url, {"title": "absent"}).json(), [])
+        response = self.client.get(reverse("main:show_projects"), {"title": "folio"})
+        self.assertEqual(response.context["title_query"], "folio")
+        self.assertNotIn("project_list", response.context)
 
     def test_mutations_require_csrf_and_accept_valid_token(self):
         from django.test import Client
