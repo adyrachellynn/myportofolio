@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-v$mn*4i!+!f%it9ndq2i3%4!y83%7i_n@hneew#yvh00+z9ew6
 # Tetap True selama masa pengerjaan tugas/tutorial
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "adyra-rachellyn-myportofolio.pws.cs.ui.ac.id", "*"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "10.0.2.2", "adyra-rachellyn-myportofolio.pws.cs.ui.ac.id", "*"]
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
@@ -32,12 +32,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -132,4 +135,19 @@ CSRF_TRUSTED_ORIGINS = [
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
+]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+CORS_ALLOW_ALL_ORIGINS = not PRODUCTION
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
 ]

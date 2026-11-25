@@ -284,7 +284,7 @@ class ProjectAPITest(APITestCase):
                     format="json",
                 )
 
-                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 401 if user is None else 403)
                 self.assertEqual(Project.objects.count(), before)
 
     def test_superuser_can_create_project(self):
@@ -324,7 +324,7 @@ class ProjectAPITest(APITestCase):
                     format="json",
                 )
 
-                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 401 if user is None else 403)
                 self.project.refresh_from_db()
                 self.assertEqual(self.project.title, "Portfolio Website")
 
@@ -367,7 +367,7 @@ class ProjectAPITest(APITestCase):
 
                 response = self.client.delete(self.detail_url)
 
-                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 401 if user is None else 403)
                 self.assertTrue(
                     Project.objects.filter(pk=self.project.pk).exists()
                 )
